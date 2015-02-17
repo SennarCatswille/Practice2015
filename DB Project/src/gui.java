@@ -6,6 +6,10 @@ import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.sql.Connection;
+import java.sql.Driver;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
 import javax.swing.ButtonGroup;
@@ -28,6 +32,7 @@ import javax.swing.border.EtchedBorder;
  *
  */
 public class gui {
+	public Logs logs;
 	private Cursor hand = null;
 	private JFrame frame = null;
 	private GridBagLayout gbl = null;
@@ -37,18 +42,22 @@ public class gui {
 	private JPanel cPanel = null;
 	private JRadioButton Radio1 = null;
 	private JRadioButton Radio2 = null;
+	private JTextField dbHost = null;
 	private JTextField dbName = null;
 	private JTextField dbUser = null;
-	private JPasswordField dbPass = null;
+	private JPasswordField dbPass = null;	
 	private String filepath = null, dirpath = null;
+	private JLabel dbAnswer = new JLabel();
+	private boolean radioFlag = false;
 	
-	public void createGUI() {
+	public void createGUI(Logs l) {
+		logs = l;
 		hand = new Cursor(Cursor.HAND_CURSOR);
 		// Создаем форму	
 		frame = new JFrame("DB Project");
-		frame.setSize(400, 500);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
+		frame.setIconImage(createIcon("image/db26.png").getImage());
 		gbl = new GridBagLayout();
 		frame.setLayout(gbl);
 		frame.setResizable(false);
@@ -104,31 +113,81 @@ public class gui {
 		dbAuthPanel.setLayout(new FlowLayout(FlowLayout.LEFT));
 		dbAuth.addTab("Свойста БД",	dbAuthPanel);
 		
+		JLabel dbHostLabel = new JLabel();
+		dbHostLabel.setText("Расположение БД: ");
+		dbHostLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
+		dbHost = new JTextField(11);
+		dbHost.setText("localhost:50000");
+		
 		JLabel dbNameLabel = new JLabel();
-		dbNameLabel.setText("Имя базы данных: ");
+		dbNameLabel.setText("Имя базы данных:  ");
 		dbNameLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		dbName = new JTextField(11);
 		
 		JLabel dbUserLabel = new JLabel();
-		dbUserLabel.setText("Пользователь:       ");
+		dbUserLabel.setText("Пользователь:        ");
 		dbUserLabel.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		dbUser = new JTextField(11);
 		
 		JLabel dbPassLabel = new JLabel();
-		dbPassLabel.setText("Пароль:                    ");
+		dbPassLabel.setText("Пароль:                     ");
 		dbPass = new JPasswordField(11);
 		
+		JPanel dbTest = createDBAuthPanel();
+		
+		
+		dbAuthPanel.add(dbHostLabel);
+		dbAuthPanel.add(dbHost);
 		dbAuthPanel.add(dbNameLabel);
 		dbAuthPanel.add(dbName);
 		dbAuthPanel.add(dbUserLabel);
 		dbAuthPanel.add(dbUser);
 		dbAuthPanel.add(dbPassLabel);
 		dbAuthPanel.add(dbPass);
+		dbAuthPanel.add(dbTest);
 		
-		dbAuth.setPreferredSize(new Dimension(266, 100));
+		dbAuth.setPreferredSize(new Dimension(266, 150));
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbl.setConstraints(dbAuth, gbc);
 		return dbAuth;
+	}
+	
+	private JPanel createDBAuthPanel() {
+		JPanel dbTest = new JPanel();
+		dbTest.setLayout(new FlowLayout(FlowLayout.LEFT, 0, 0));
+		dbTest.setPreferredSize(new Dimension(250, 33));
+		
+		JButton dbTestButton = new JButton("Проверить");
+		dbTestButton.setCursor(hand);
+		dbTestButton.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                String[] dbInfo = checkDB();
+                if (dbInfo != null) {
+					try {
+						Driver driver = new COM.ibm.db2.jdbc.app.DB2Driver();
+						DriverManager.registerDriver(driver);
+						String strcon = "jdbc:db2:" + dbInfo[1];
+						Connection con = DriverManager.getConnection(strcon, dbInfo[2], dbInfo[3]);					
+						if (con != null) {
+							dbAnswer.setIcon(createIcon("image/good.png"));
+							dbAnswer.setText(" Успешно!");
+						}
+						con = null;
+					} catch (SQLException e1) {
+						dbAnswer.setIcon(createIcon("image/bad.png"));
+						dbAnswer.setText(" Неудача!");
+					}        	        
+        	        
+                }
+            }
+        });		
+		JPanel emptyPanel = new JPanel();
+		emptyPanel.setPreferredSize(new Dimension(20, 5));
+
+		dbTest.add(dbTestButton);
+		dbTest.add(emptyPanel);
+		dbTest.add(dbAnswer);
+		return dbTest;
 	}
 	
 	private JPanel createRadioGroup() {
@@ -199,6 +258,7 @@ public class gui {
 		blabelChoose.setText("Выберите файл эталонной БД:");
 		JButton bfChoose = new JButton("Выбрать файл...");
 		bfChoose.setCursor(hand);
+		
 		bfChoose.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 JFileChooser fileOpen = new JFileChooser();     
@@ -206,7 +266,7 @@ public class gui {
                 int ret = fileOpen.showDialog(null, "Открыть файл");                
                 if (ret == JFileChooser.APPROVE_OPTION) {
                 	File file = fileOpen.getSelectedFile();
-                    filepath = file.getPath();
+                    filepath = file.getPath();                   
                 }
             }
         });		
@@ -251,61 +311,92 @@ public class gui {
 	private class RadioAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			if (Radio1.isSelected()) {
+			if (Radio1.isSelected() && radioFlag) {
 				cPanel.remove(bPanel);
 				cPanel.add(createPanel1());
-			} else if (Radio2.isSelected()) {
+				radioFlag = false;
+			} else if (Radio2.isSelected() && !radioFlag) {
 				cPanel.remove(aPanel);
 				cPanel.add(createPanel2());
+				radioFlag = true;
 			}
 			cPanel.updateUI();
 		}		
 	}
 	
+	private String[] checkDB() {
+		String[] dbauth = new String[4];
+		dbauth[0] = new String(dbHost.getText());
+		dbauth[1] = new String(dbName.getText());
+		dbauth[2] = new String(dbUser.getText());
+		dbauth[3] = new String(dbPass.getPassword());
+		if (dbauth[0].isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Заполните поле расположения БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		if (dbauth[1].isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Заполните поле названия БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		if (dbauth[2].isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Заполните поле пользователя БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		if (dbauth[3].isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Заполните поле пароля пользователя БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
+			return null;
+		}
+		return dbauth;
+	}
+	
 	private class ConfirmAction implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			String name = new String(dbName.getText());
-			String user = new String(dbUser.getText());
-			String pass = new String(dbPass.getPassword());
-			if (name.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Заполните поле названия БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			if (user.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Заполните поле пользователя БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			if (pass.isEmpty()) {
-				JOptionPane.showMessageDialog(null, "Заполните поле пароля пользователя БД!", "Ошибка ввода", JOptionPane.ERROR_MESSAGE);
-				return;
-			}
-			if (Radio1.isSelected()) {
-				if (dirpath.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "Выберите место сохранения файла!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
-					return;
+			String[] dbInfo = checkDB();
+			if (dbInfo != null) {
+				if (Radio1.isSelected()) {
+					if (dirpath.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Выберите место сохранения файла!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					logs.createLogFrame();
+					logs.addMsg("Приступаю к работе...");
+					idealDataBase db = new idealDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3]);
+					dirpath += "\\out.dat";
+					db.getMeta(dirpath);
+					db.close();
+					String str = "Программа успешно завершена!" + logs.newLine + "Созданный файл находится в " + dirpath;
+					JOptionPane.showMessageDialog(null, str, "Успех", JOptionPane.INFORMATION_MESSAGE);
+				} else if (Radio2.isSelected()) {
+					if (filepath.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Выберите файл эталонной базы данных!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					if (dirpath.isEmpty()) {
+						JOptionPane.showMessageDialog(null, "Выберите место сохранения файла!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
+						return;
+					}
+					logs.createLogFrame();
+					logs.addMsg("Приступаю к работе...");
+					userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
+					dirpath += "\\out.txt";
+					int flag = db.analysis(dirpath);
+					db.close();		
+					String str = "Сравнение успешно завершено!";
+					if (flag != -1) {
+						if (flag == 1) {
+							str += "Созданный файл находится в " + dirpath;
+						} else {
+							str += "Сравниваемые базы данных идентичны!";
+						}
+						JOptionPane.showMessageDialog(null, str, "Успех", JOptionPane.INFORMATION_MESSAGE);
+					} else {
+						str = "Программа завершена с ошибкой! Попробуйте еще раз.";
+						JOptionPane.showMessageDialog(null, str, "Неудача", JOptionPane.INFORMATION_MESSAGE);
+					}				
 				}
-				idealDataBase db = new idealDataBase(name, user, pass);
-				dirpath += "/out.dat";
-				db.getMeta(dirpath);
-				db.close();
-				String str = "Программа успешно завершена!" + System.getProperty("line.separator") + "Созданный файл находится в " + dirpath;
-				JOptionPane.showMessageDialog(null, str, "Успех", JOptionPane.INFORMATION_MESSAGE);
-			} else if (Radio2.isSelected()) {
-				if (filepath.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "Выберите файл эталонной базы данных!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				if (dirpath.isEmpty()) {
-					JOptionPane.showMessageDialog(null, "Выберите место сохранения файла!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
-					return;
-				}
-				userDataBase db = new userDataBase(name, user, pass, Filework.read(filepath));
-				dirpath += "/out.txt";
-				db.analysis(dirpath);
-				db.close();		
-				String str = "Сравнение успешно завершено!" + System.getProperty("line.separator") + "Созданный файл находится в " + dirpath;
-				JOptionPane.showMessageDialog(null, str, "Успех", JOptionPane.INFORMATION_MESSAGE);
+			dirpath = "";
+			filepath = "";
 			}
 		}
 	}

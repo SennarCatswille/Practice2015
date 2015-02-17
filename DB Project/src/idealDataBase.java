@@ -9,6 +9,7 @@ public class idealDataBase {
 	private Connection con = null;
 	private DatabaseMetaData dbmeta = null;
 	private String text = "";
+	Logs l = null;
 /*
  * Подключение к PostgreSQL
  * 
@@ -28,26 +29,29 @@ public class idealDataBase {
 	}
 */
 	
-	idealDataBase (String name, String user, String pass) {
+	idealDataBase (Logs g, String host, String name, String user, String pass) {
 		boolean isDriverRegistred = false;
+		l = g;
 		try {
 			Driver driver = new COM.ibm.db2.jdbc.app.DB2Driver();
 	        DriverManager.registerDriver(driver);
-	        System.out.println("Драйвер DB2 загружен успешно!");
+	        
+	        l.addMsg("Драйвер DB2 загружен успешно!");
 	        isDriverRegistred = true;
 		} catch (SQLException e) {
-			System.out.println("Ошибка загрузки драйвера DB2!");
-			e.printStackTrace();
+			l.addMsg("Ошибка загрузки драйвера DB2!");
+			l.addMsg(e.getMessage());
 		}
 		if (isDriverRegistred) {
 			try {
+				//String strcon = "jdbc:db2://" + host + "/" + name;
 				String strcon = "jdbc:db2:" + name;
-				con = DriverManager.getConnection(strcon, user, pass);					
-				System.out.println("Подключение к БД установлено успешно!");
+				con = DriverManager.getConnection(strcon, user, pass);				
+				l.addMsg("Подключение к БД установлено успешно!");
 				dbmeta = con.getMetaData();
 			} catch (SQLException e) {
-				System.out.println("Не удалось подключиться к БД!");
-				e.printStackTrace();
+				l.addMsg("Не удалось подключиться к БД!");
+				l.addMsg(e.getMessage());
 			}
 		}
 	}
@@ -60,6 +64,7 @@ public class idealDataBase {
 			ArrayList<String> ss = Schemes();
 			for (int i = 0; i < ss.size(); i++) {
 				String sname = ss.get(i);
+				l.addMsg("Анализирую схему " + Integer.toString(i+1) + "/" + Integer.toString(ss.size()) + " [" + sname + "]");
 				ResultSet rs = dbmeta.getTables(null, sname, "%", null);
 				if (i > 0) text += "| " + sname; else text += sname;
 				while (rs.next()) {
@@ -70,16 +75,16 @@ public class idealDataBase {
 						Tables(sname, tname);
 						Keys(sname, tname);	
 					} catch (IOException e) {
-						System.out.println("Ошибка записи в файл!");
-						e.printStackTrace();
+						l.addMsg("Ошибка записи в файл!");
+						l.addMsg(e.getMessage());
 					}
 				}
 			}	
 			text += "|";
 			Filework.write(fname, text);
 		} catch (SQLException e) {
-			System.out.println("Ошибка выполнения запросов к БД!");
-			e.printStackTrace();
+			l.addMsg("Ошибка выполнения запросов к БД!");
+			l.addMsg(e.getMessage());
 		}		
 	}
 	
@@ -118,12 +123,12 @@ public class idealDataBase {
 	private void Keys (String sname, String tname) throws SQLException, IOException {
 		ResultSet keys = dbmeta.getPrimaryKeys(null, sname, tname);
 		while (keys.next()) {
-			text += " P:" + keys.getString("COLUMN_NAME");
+			text += " P:" + keys.getString("TABLE_NAME") + " " + keys.getString("COLUMN_NAME");
 		}
 		//Инфа о внешних ключах
 		ResultSet fk = dbmeta.getCrossReference(null, null, null, null, sname, tname);
 		while (fk.next()) {
-			text += " F:" + fk.getString("FKCOLUMN_NAME") + " " + fk.getString("PKTABLE_NAME") + " " + fk.getString("PKCOLUMN_NAME");
+			text += " F:" + fk.getString("FKTABLE_NAME") + " " + fk.getString("FKCOLUMN_NAME") + " " + fk.getString("PKTABLE_NAME") + " " + fk.getString("PKCOLUMN_NAME");
 		}
 	}
 	
@@ -134,7 +139,8 @@ public class idealDataBase {
 				con.commit();
 				con.close();
 			} catch (Exception e) {
-				System.out.println("Problem in closing DB2 connection: " + e.getMessage());
+				l.addMsg("Проблема с закрытием подключения к DB2:");
+				l.addMsg(e.getMessage());
 			}
 			con = null;
 		}

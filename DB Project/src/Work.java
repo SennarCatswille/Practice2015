@@ -10,7 +10,8 @@ public class Work {
 	
 	public static void main(String[] args) {		
 		gui g = new gui();
-		g.createGUI();
+		Logs l = new Logs();
+		g.createGUI(l);
 		
 		
 		/*

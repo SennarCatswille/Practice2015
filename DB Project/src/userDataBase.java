@@ -10,6 +10,7 @@ public class userDataBase {
 	private Connection con = null;
 	private DatabaseMetaData dbmeta = null;
 	private String text = "";
+	Logs l = null;
 /*
  * Подключение к PostgreSQL
  * 
@@ -29,37 +30,42 @@ public class userDataBase {
 	}
 */
 	
-	userDataBase (String name, String user, String pass, String newtext) {
+	userDataBase (Logs g, String host, String name, String user, String pass, String newtext) {
 		boolean isDriverRegistred = false;
+		l = g;
 		try {
 			Driver driver = new COM.ibm.db2.jdbc.app.DB2Driver();
 	        DriverManager.registerDriver(driver);
-	        System.out.println("Драйвер DB2 загружен успешно!");
+	        l.addMsg("Драйвер DB2 загружен успешно!");
 	        isDriverRegistred = true;
 		} catch (SQLException e) {
-			System.out.println("Ошибка загрузки драйвера DB2!");
-			e.printStackTrace();
+			l.addMsg("Ошибка загрузки драйвера DB2!");
+			l.addMsg(e.getMessage());
 		}
 		if (isDriverRegistred) {
 			try {
-				String strcon = "jdbc:db2:" + name;
-				con = DriverManager.getConnection(strcon, user, pass);					
-				System.out.println("Подключение к БД установлено успешно!");
+				String strcon = "jdbc:db2://" + host + "/" + name;
+				con = DriverManager.getConnection(strcon, user, pass);
+				l.addMsg("Подключение к БД установлено успешно!");
 				dbmeta = con.getMetaData();
 			} catch (SQLException e) {
-				System.out.println("Не удалось подключиться к БД!");
-				e.printStackTrace();
+				l.addMsg("Не удалось подключиться к БД!");
+				l.addMsg(e.getMessage());
 			}
 		}	
 		text = newtext;
 	}
 	
-	public void analysis (String foname) {
+	public int analysis (String foname) {
 		String workstr = null;
+		String tablestr = null;
 		ArrayList<String> notEl= new ArrayList<String>();
 		int pos = 0;
-		System.out.println("Начинаю анализ базы данных...");
+		l.addMsg("Начинаю анализ базы данных...");
 		try {
+			//почитать про StringBuilder
+			//основной стрингбилдер - файл
+			//
 			dbmeta = con.getMetaData();
 			ArrayList<String> ss = Schemes();
 			for (int i = 0; i < ss.size(); i++) {
@@ -69,10 +75,11 @@ public class userDataBase {
 				if (pos == -1) {
 					notEl.add("Отсутствует схема " + sname + System.getProperty("line.separator"));
 					continue;
-				}							
+				}					
+				l.addMsg("Анализирую схему " + Integer.toString(i+1) + "/" + Integer.toString(ss.size()) + " [" + sname + "]");
 				//temp = text.substring(0, pos);
 				//pos += sname.length();
-				int palka = text.indexOf("|");
+				int palka = text.indexOf("|", pos+1);
 				workstr = text.substring(pos + sname.length(), palka).trim();
 				//workstr.trim();
 				//int ololo = workstr.length()+1;
@@ -86,61 +93,76 @@ public class userDataBase {
 						notEl.add(TableToString(tname, sname, false));
 						continue;
 					}
-					workstr = workstr.substring(tname.length()+2).trim();
+					int wnext = workstr.indexOf("T:", pos+2);
+					if (wnext == -1) {
+						tablestr = workstr.substring(pos + tname.length() + 2).trim();
+						workstr = workstr.substring(0, pos).trim();
+					} else {
+						tablestr = workstr.substring(pos + tname.length() + 2, wnext).trim();
+						workstr = (workstr.substring(0, pos) + workstr.substring(wnext)).trim();
+					}
+					//workstr = workstr.substring(tname.length()+2).trim();
 					// Проверка индексов
 					ArrayList<String> ind = Indexes(sname, tname);
 					for (int j = 0; j < ind.size(); j++) {
 						//tempstr = text.substring(0, text.indexOf(":", 3)-2);
-						pos = workstr.indexOf(ind.get(j));
+						pos = tablestr.indexOf(ind.get(j));
 						if (pos == -1) {
 							notEl.add(IndexToString(ind.get(j), tname, false));
 							continue;
 						}
-						if (ind.get(j).length() != workstr.length()) {
-							workstr = (workstr.substring(0, pos) + workstr.substring(pos + 1 + ind.get(j).length())).trim();
-						} else workstr = "";
+						if (ind.get(j).length() != tablestr.length()) {
+							tablestr = (tablestr.substring(0, pos) + tablestr.substring(pos + ind.get(j).length())).trim();
+						} else tablestr = "";
 					}
 					ind = null;
 					// Проверка полей таблиц
 					ArrayList<String> col = Tables(sname, tname);
 					for (int j = 0; j < col.size(); j++) {
-						pos = workstr.indexOf(col.get(j));
+						pos = tablestr.indexOf(col.get(j));
 						if (pos == -1) {
 							notEl.add(ColumnToString(col.get(j), tname, false));
 							continue;
 						}
-						if (col.get(j).length() != workstr.length()) {
-							workstr = (workstr.substring(0, pos) + workstr.substring(pos + 1 + col.get(j).length())).trim();		
-						} else workstr = "";
+						if (col.get(j).length() != tablestr.length()) {
+							tablestr = (tablestr.substring(0, pos) + tablestr.substring(pos + col.get(j).length())).trim();		
+						} else tablestr = "";
 					}
 					col = null;
 					// Проверка ключей
 					ArrayList<String> key = Keys(sname, tname);
 					for (int j = 0; j < key.size(); j++) {
-						pos = workstr.indexOf(key.get(j));
+						pos = tablestr.indexOf(key.get(j));
 						if (pos == -1) {
-							notEl.add(KeyToString(key.get(j), tname, false));
+							notEl.add(KeyToString(key.get(j), false));
 							continue;
 						}
-						if (key.get(j).length() != workstr.length()) {
-							workstr = (workstr.substring(0, pos) + workstr.substring(pos + 1 + key.get(j).length())).trim();
-						} else workstr = "";
+						if (key.get(j).length() != tablestr.length()) {
+							tablestr = (tablestr.substring(0, pos) + tablestr.substring(pos + key.get(j).length())).trim();
+						} else tablestr = "";
 					}
 					key = null;
 					// остаток файла
-					if (!workstr.isEmpty()) {
-						String c = workstr.substring(0, 2);
-						while (!c.equals("T:") && !workstr.isEmpty()) {
+					//if (!tablestr.isEmpty()) {
+						
+						while (!tablestr.isEmpty()) {
+							String c = tablestr.substring(0, 2);
 							//workstr = workstr.substring(2);
-							String t = workstr.substring(0, workstr.indexOf(":", 3)-1).trim();
+							int next = tablestr.indexOf(":", 3);
+							String t = null;
+							if (next != -1) {
+								t = tablestr.substring(0, next-1).trim();
+							} else {
+								t = tablestr;
+							}
 							if (c.equals("I:"))	notEl.add(IndexToString(t, tname, true));
 							if (c.equals("C:")) notEl.add(ColumnToString(t, tname, true));
-							if (c.equals("P:")) notEl.add(KeyToString(t, tname, true));
-							if (c.equals("F:")) notEl.add(KeyToString(t, tname, true));
-							workstr = workstr.substring(t.length()).trim();
-							c = workstr.substring(0, 2);
+							if (c.equals("P:")) notEl.add(KeyToString(t, true));
+							if (c.equals("F:")) notEl.add(KeyToString(t, true));
+							tablestr = tablestr.substring(t.length()).trim();
+							//c = tablestr.substring(0, 2);
 						}
-					}					
+					//}					
 				}				
 			}
 			if (!notEl.isEmpty()){
@@ -150,20 +172,23 @@ public class userDataBase {
 				}
 				out.flush();
 				out.close();
-				System.out.println("Программа завершена! Созданный файл находится по адресу " + foname);
+				l.addMsg("Программа завершена! Созданный файл находится по адресу " + foname);
+				return 1;
 			} else {
-				System.out.println("Пользовательская база данных идентична эталонной!");
-			}
+				l.addMsg("Пользовательская база данных идентична эталонной!");
+				return 0;
+			}	
 		} catch (SQLException e) {
-			System.out.println("Ошибка выпонения запросов к базы данных!");
-			e.printStackTrace();
+			l.addMsg("Ошибка выпонения запросов к базы данных!");
+			l.addMsg(e.getMessage());
 		} catch (IOException e) {
-			System.out.println("Ошибка создания или записи файла!");
-			e.printStackTrace();
+			l.addMsg("Ошибка создания или записи файла!");
+			l.addMsg(e.getMessage());
 		} catch (StringIndexOutOfBoundsException e) {
-			System.out.println(pos);
-			System.out.println(workstr);
+			l.addMsg("Неизвестная ошибка!");
+			l.addMsg(e.getMessage());
 		}
+		return -1;
 	}
 	
 	// Преобразование для вывода в файл индекса
@@ -208,21 +233,21 @@ public class userDataBase {
 		return str;
 	}
 	// Преобразование информации о ключе для вывода в файл
-	private String KeyToString(String key, String tn, boolean mark) {
+	private String KeyToString(String key, boolean mark) {
 		String fp = key.substring(0, 2);
 		key = key.substring(2);
 		String a[] = key.split(" ");
-		String str = "В таблице " + tn;
+		String str = "В таблице " + a[0];
 		if (mark) {
 			str += " отсутствует ";
 		} else {
 			str += " найден лишний ";
 		}
 		if (fp.equals("P:")) {
-			str += "первичный ключ " + a[0] + ".";
+			str += "первичный ключ " + a[1] + ".";
 		} else if (fp.equals("F:")) {
-			str += "внешний ключ " + a[0];
-			str += " к таблице " + a[1] + " (" + a[2] + ").";
+			str += "внешний ключ " + a[1];
+			str += " к таблице " + a[2] + " (" + a[3] + ").";
 		}
 		str += System.getProperty("line.separator");
 		return str;
@@ -285,13 +310,13 @@ public class userDataBase {
 		ArrayList<String> al = new ArrayList<String>();
 		ResultSet keys = dbmeta.getPrimaryKeys(null, sname, tname);
 		while (keys.next()) {
-			str = " P:" + keys.getString("COLUMN_NAME");
+			str = " P:" + keys.getString("TABLE_NAME") + " " + keys.getString("COLUMN_NAME");
 			al.add(str.trim());
 		}
 		//Инфа о внешних ключах
 		ResultSet fk = dbmeta.getCrossReference(null, null, null, null, sname, tname);
 		while (fk.next()) {
-			str = " F:" + fk.getString("FKCOLUMN_NAME") + " " + fk.getString("PKTABLE_NAME") + " " + fk.getString("PKCOLUMN_NAME");
+			str = " F:" + fk.getString("FKTABLE_NAME") + " " + fk.getString("FKCOLUMN_NAME") + " " + fk.getString("PKTABLE_NAME") + " " + fk.getString("PKCOLUMN_NAME");
 			al.add(str.trim());
 		}
 		return al;
@@ -304,7 +329,8 @@ public class userDataBase {
 				con.commit();
 				con.close();
 			} catch (Exception e) {
-				System.out.println("Проблема при закрытии подключения: " + e.getMessage());
+				l.addMsg("Проблема при закрытии подключения: ");
+				l.addMsg(e.getMessage());
 			}
 			con = null;
 		}
