@@ -18,6 +18,7 @@ public class Logs {
 	public void createLogFrame() {
 		JFrame form = new JFrame ("Лог действий");
 		form.setSize(500, 300);
+		form.setResizable(false);
 		
 		logs = new JTextArea(5, 20);
         logs.setEditable(false);

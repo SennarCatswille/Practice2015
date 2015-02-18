@@ -9,6 +9,7 @@ public class idealDataBase {
 	private Connection con = null;
 	private DatabaseMetaData dbmeta = null;
 	private String text = "";
+	private boolean flag = false;
 	Logs l = null;
 /*
  * Подключение к PostgreSQL
@@ -49,11 +50,16 @@ public class idealDataBase {
 				con = DriverManager.getConnection(strcon, user, pass);				
 				l.addMsg("Подключение к БД установлено успешно!");
 				dbmeta = con.getMetaData();
+				flag = true;
 			} catch (SQLException e) {
 				l.addMsg("Не удалось подключиться к БД!");
 				l.addMsg(e.getMessage());
 			}
-		}
+		}		
+	}
+	
+	public boolean GetState() {
+		return flag;
 	}
 	
 	//Получить мета-инфу

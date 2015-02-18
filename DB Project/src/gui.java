@@ -56,7 +56,6 @@ public class gui {
 		// Создаем форму	
 		frame = new JFrame("DB Project");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.setLocationRelativeTo(null);
 		frame.setIconImage(createIcon("image/db26.png").getImage());
 		gbl = new GridBagLayout();
 		frame.setLayout(gbl);
@@ -84,6 +83,7 @@ public class gui {
 		//-------------------------------------------------------------
 		// Сжимаем форму и показываем ее
 		frame.pack();
+		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);		
 	}
 	
@@ -362,11 +362,13 @@ public class gui {
 					logs.createLogFrame();
 					logs.addMsg("Приступаю к работе...");
 					idealDataBase db = new idealDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3]);
-					dirpath += "\\out.dat";
-					db.getMeta(dirpath);
-					db.close();
-					String str = "Программа успешно завершена!" + logs.newLine + "Созданный файл находится в " + dirpath;
-					JOptionPane.showMessageDialog(null, str, "Успех", JOptionPane.INFORMATION_MESSAGE);
+					if (db.GetState()) {
+						dirpath += "\\out.dat";
+						db.getMeta(dirpath);
+						db.close();
+						String str = "Программа успешно завершена! Созданный файл находится в " + dirpath;
+						logs.addMsg(str);
+					}
 				} else if (Radio2.isSelected()) {
 					if (filepath.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "Выберите файл эталонной базы данных!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
@@ -379,21 +381,23 @@ public class gui {
 					logs.createLogFrame();
 					logs.addMsg("Приступаю к работе...");
 					userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
-					dirpath += "\\out.txt";
-					int flag = db.analysis(dirpath);
-					db.close();		
-					String str = "Сравнение успешно завершено!";
-					if (flag != -1) {
-						if (flag == 1) {
-							str += "Созданный файл находится в " + dirpath;
+					if (db.GetState()) {
+						dirpath += "\\out.txt";
+						int flag = db.analysis(dirpath);
+						db.close();		
+						String str = "Сравнение успешно завершено!";
+						if (flag != -1) {
+							if (flag == 1) {
+								str += "Созданный файл находится в " + dirpath;
+							} else {
+								str += "Сравниваемые базы данных идентичны!";
+							}
+							
 						} else {
-							str += "Сравниваемые базы данных идентичны!";
-						}
-						JOptionPane.showMessageDialog(null, str, "Успех", JOptionPane.INFORMATION_MESSAGE);
-					} else {
-						str = "Программа завершена с ошибкой! Попробуйте еще раз.";
-						JOptionPane.showMessageDialog(null, str, "Неудача", JOptionPane.INFORMATION_MESSAGE);
-					}				
+							str = "Программа завершена с ошибкой! Попробуйте еще раз.";
+						}			
+						logs.addMsg(str);
+					}					
 				}
 			dirpath = "";
 			filepath = "";
