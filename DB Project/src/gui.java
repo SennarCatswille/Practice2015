@@ -7,7 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
 import java.sql.Connection;
-import java.sql.Driver;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
@@ -164,9 +163,8 @@ public class gui {
                 String[] dbInfo = checkDB();
                 if (dbInfo != null) {
 					try {
-						Driver driver = new COM.ibm.db2.jdbc.app.DB2Driver();
-						DriverManager.registerDriver(driver);
-						String strcon = "jdbc:db2:" + dbInfo[1];
+						Class.forName("com.ibm.db2.jcc.DB2Driver");						
+						String strcon = "jdbc:db2://" + dbInfo[0] + "/" + dbInfo[1];
 						Connection con = DriverManager.getConnection(strcon, dbInfo[2], dbInfo[3]);					
 						if (con != null) {
 							dbAnswer.setIcon(createIcon("image/good.png"));
@@ -176,6 +174,9 @@ public class gui {
 					} catch (SQLException e1) {
 						dbAnswer.setIcon(createIcon("image/bad.png"));
 						dbAnswer.setText(" Неудача!");
+					} catch (ClassNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
 					}        	        
         	        
                 }
@@ -364,10 +365,11 @@ public class gui {
 					idealDataBase db = new idealDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3]);
 					if (db.GetState()) {
 						dirpath += "\\out.dat";
-						db.getMeta(dirpath);
-						db.close();
-						String str = "Программа успешно завершена! Созданный файл находится в " + dirpath;
-						logs.addMsg(str);
+						if (db.getMeta(dirpath)) {
+							db.close();
+							String str = "Программа успешно завершена! Созданный файл находится в " + dirpath;
+							logs.addMsg(str);
+						}
 					}
 				} else if (Radio2.isSelected()) {
 					if (filepath.isEmpty()) {
@@ -388,7 +390,7 @@ public class gui {
 						String str = "Сравнение успешно завершено!";
 						if (flag != -1) {
 							if (flag == 1) {
-								str += "Созданный файл находится в " + dirpath;
+								str += "Программа завершена! Созданный файл находится в " + dirpath;
 							} else {
 								str += "Сравниваемые базы данных идентичны!";
 							}

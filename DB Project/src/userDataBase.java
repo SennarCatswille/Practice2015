@@ -9,7 +9,7 @@ import java.io.*;
 public class userDataBase {
 	private Connection con = null;
 	private DatabaseMetaData dbmeta = null;
-	private String text = "";
+	private StringBuilder text = new StringBuilder();
 	private boolean flag = false;
 	Logs l = null;
 /*
@@ -35,17 +35,17 @@ public class userDataBase {
 		boolean isDriverRegistred = false;
 		l = g;
 		try {
-			Driver driver = new COM.ibm.db2.jdbc.app.DB2Driver();
-	        DriverManager.registerDriver(driver);
+			Class.forName("com.ibm.db2.jcc.DB2Driver");	
 	        l.addMsg("Драйвер DB2 загружен успешно!");
 	        isDriverRegistred = true;
-		} catch (SQLException e) {
+		} catch (ClassNotFoundException e) {
 			l.addMsg("Ошибка загрузки драйвера DB2!");
 			l.addMsg(e.getMessage());
 		}
 		if (isDriverRegistred) {
 			try {
 				String strcon = "jdbc:db2://" + host + "/" + name;
+				//String strcon = "jdbc:db2:" + name;
 				con = DriverManager.getConnection(strcon, user, pass);
 				l.addMsg("Подключение к БД установлено успешно!");
 				dbmeta = con.getMetaData();
@@ -55,7 +55,7 @@ public class userDataBase {
 				l.addMsg(e.getMessage());
 			}
 		}	
-		text = newtext;
+		text.append(newtext);
 	}
 	
 	public boolean GetState() {
@@ -63,8 +63,8 @@ public class userDataBase {
 	}
 	
 	public int analysis (String foname) {
-		String workstr = null;
-		String tablestr = null;
+		StringBuilder workstr = new StringBuilder();
+		StringBuilder tablestr = new StringBuilder();
 		ArrayList<String> notEl= new ArrayList<String>();
 		int pos = 0;
 		l.addMsg("Начинаю анализ базы данных...");
@@ -77,6 +77,7 @@ public class userDataBase {
 			for (int i = 0; i < ss.size(); i++) {
 				pos = 0;
 				String sname = ss.get(i);
+			// Ищем схему
 				pos = text.indexOf(sname);
 				if (pos == -1) {
 					notEl.add("Отсутствует схема " + sname + System.getProperty("line.separator"));
@@ -85,11 +86,17 @@ public class userDataBase {
 				l.addMsg("Анализирую схему " + Integer.toString(i+1) + "/" + Integer.toString(ss.size()) + " [" + sname + "]");
 				//temp = text.substring(0, pos);
 				//pos += sname.length();
+			// Ищем конец схемы
+				
 				int palka = text.indexOf("|", pos+1);
-				workstr = text.substring(pos + sname.length(), palka).trim();
+				workstr.delete(0, workstr.length());
+				workstr.append(text.substring(pos + sname.length(), palka));
+				TrimStringBuilder(workstr);
 				//workstr.trim();
 				//int ololo = workstr.length()+1;
-				text = (text.substring(0, pos) + text.substring(pos + 2 + workstr.length() + sname.length())).trim();		
+				//text.append(text.substring(0, pos) + text.substring(pos + 2 + workstr.length() + sname.length()));		
+				text.delete(pos, palka + 1);
+				TrimStringBuilder(text);
 				// Получаем таблицы
 				ResultSet rs = dbmeta.getTables(null, sname, "%", null);
 				while (rs.next()) {
@@ -100,58 +107,65 @@ public class userDataBase {
 						continue;
 					}
 					int wnext = workstr.indexOf("T:", pos+2);
+					tablestr.delete(0, tablestr.length());
 					if (wnext == -1) {
-						tablestr = workstr.substring(pos + tname.length() + 2).trim();
-						workstr = workstr.substring(0, pos).trim();
+						tablestr.append(workstr.substring(pos + tname.length() + 2));
+						workstr.delete(pos, workstr.length());
 					} else {
-						tablestr = workstr.substring(pos + tname.length() + 2, wnext).trim();
-						workstr = (workstr.substring(0, pos) + workstr.substring(wnext)).trim();
+						tablestr.append(workstr.substring(pos + tname.length() + 2, wnext));
+						TrimStringBuilder(tablestr);
+						workstr.delete(pos, wnext);
 					}
 					//workstr = workstr.substring(tname.length()+2).trim();
 					// Проверка индексов
 					ArrayList<String> ind = Indexes(sname, tname);
 					for (int j = 0; j < ind.size(); j++) {
 						//tempstr = text.substring(0, text.indexOf(":", 3)-2);
-						pos = tablestr.indexOf(ind.get(j));
+						String tind = ind.get(j);
+						pos = tablestr.indexOf(tind);
 						if (pos == -1) {
 							notEl.add(IndexToString(ind.get(j), tname, false));
 							continue;
 						}
 						if (ind.get(j).length() != tablestr.length()) {
-							tablestr = (tablestr.substring(0, pos) + tablestr.substring(pos + ind.get(j).length())).trim();
-						} else tablestr = "";
+							tablestr.delete(pos, pos + tind.length());
+							TrimStringBuilder(tablestr);
+						} else tablestr.delete(0, tablestr.length());
 					}
 					ind = null;
 					// Проверка полей таблиц
 					ArrayList<String> col = Tables(sname, tname);
 					for (int j = 0; j < col.size(); j++) {
-						pos = tablestr.indexOf(col.get(j));
+						String tcol = col.get(j);
+						pos = tablestr.indexOf(tcol);
 						if (pos == -1) {
 							notEl.add(ColumnToString(col.get(j), tname, false));
 							continue;
 						}
 						if (col.get(j).length() != tablestr.length()) {
-							tablestr = (tablestr.substring(0, pos) + tablestr.substring(pos + col.get(j).length())).trim();		
-						} else tablestr = "";
+							tablestr.delete(pos, tcol.length());		
+							TrimStringBuilder(tablestr);
+						} else tablestr.delete(0, tablestr.length());
 					}
 					col = null;
 					// Проверка ключей
 					ArrayList<String> key = Keys(sname, tname);
 					for (int j = 0; j < key.size(); j++) {
-						pos = tablestr.indexOf(key.get(j));
+						String tkey = key.get(j);
+						pos = tablestr.indexOf(tkey);
 						if (pos == -1) {
 							notEl.add(KeyToString(key.get(j), false));
 							continue;
 						}
 						if (key.get(j).length() != tablestr.length()) {
-							tablestr = (tablestr.substring(0, pos) + tablestr.substring(pos + key.get(j).length())).trim();
-						} else tablestr = "";
+							tablestr.delete(pos, tkey.length());
+							TrimStringBuilder(tablestr);
+						} else tablestr.delete(0, tablestr.length());
 					}
 					key = null;
 					// остаток файла
-					//if (!tablestr.isEmpty()) {
-						
-						while (!tablestr.isEmpty()) {
+					//if (!tablestr.isEmpty()) {						
+						while (tablestr.length() != 0) {
 							String c = tablestr.substring(0, 2);
 							//workstr = workstr.substring(2);
 							int next = tablestr.indexOf(":", 3);
@@ -159,13 +173,14 @@ public class userDataBase {
 							if (next != -1) {
 								t = tablestr.substring(0, next-1).trim();
 							} else {
-								t = tablestr;
+								t = tablestr.toString();
 							}
 							if (c.equals("I:"))	notEl.add(IndexToString(t, tname, true));
 							if (c.equals("C:")) notEl.add(ColumnToString(t, tname, true));
 							if (c.equals("P:")) notEl.add(KeyToString(t, true));
 							if (c.equals("F:")) notEl.add(KeyToString(t, true));
-							tablestr = tablestr.substring(t.length()).trim();
+							tablestr.delete(0, t.length());
+							TrimStringBuilder(tablestr);
 							//c = tablestr.substring(0, 2);
 						}
 					//}					
@@ -178,10 +193,10 @@ public class userDataBase {
 				}
 				out.flush();
 				out.close();
-				l.addMsg("Программа завершена! Созданный файл находится по адресу " + foname);
+				//l.addMsg("Программа завершена! Созданный файл находится по адресу " + foname);
 				return 1;
 			} else {
-				l.addMsg("Пользовательская база данных идентична эталонной!");
+				//l.addMsg("Пользовательская база данных идентична эталонной!");
 				return 0;
 			}	
 		} catch (SQLException e) {
@@ -195,6 +210,21 @@ public class userDataBase {
 			l.addMsg(e.getMessage());
 		}
 		return -1;
+	}
+	
+	private void TrimStringBuilder(StringBuilder str) {
+		if (str.length() != 0) {
+			char fchar = str.charAt(0);
+			while (fchar == ' ') {
+				str.deleteCharAt(0);
+				fchar = str.charAt(0);
+			}
+			char lchar = str.charAt(str.length()-1);
+			while (lchar == ' ') {
+				str.deleteCharAt(str.length()-1);
+				lchar = str.charAt(str.length()-1);
+			}
+		}
 	}
 	
 	// Преобразование для вывода в файл индекса
@@ -320,11 +350,18 @@ public class userDataBase {
 			al.add(str.trim());
 		}
 		//Инфа о внешних ключах
+		ResultSet fk = dbmeta.getImportedKeys(null, sname, tname);
+		while (fk.next()) {
+			str = " F:" + fk.getString("FKTABLE_NAME") + " " + fk.getString("FKCOLUMN_NAME") + " " + fk.getString("PKTABLE_NAME") + " " + fk.getString("PKCOLUMN_NAME");
+			//text.append(" F:").append(fk.getString("FKTABLE_NAME") + " ").append(fk.getString("FKCOLUMN_NAME") + " ").append(fk.getString("PKTABLE_NAME") + " ").append(fk.getString("PKCOLUMN_NAME"));
+			al.add(str.trim());
+		}
+		/*//Инфа о внешних ключах
 		ResultSet fk = dbmeta.getCrossReference(null, null, null, null, sname, tname);
 		while (fk.next()) {
 			str = " F:" + fk.getString("FKTABLE_NAME") + " " + fk.getString("FKCOLUMN_NAME") + " " + fk.getString("PKTABLE_NAME") + " " + fk.getString("PKCOLUMN_NAME");
 			al.add(str.trim());
-		}
+		}*/
 		return al;
 	}
 	

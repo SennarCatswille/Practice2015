@@ -9,7 +9,7 @@ import java.io.PrintWriter;
  *
  */
 public class Filework {
-	public static void write(String fileName, String text) {
+	public static void write(String fileName, StringBuilder text) {
 	    //Определяем файл
 	    File file = new File(fileName);
 	 
@@ -24,7 +24,7 @@ public class Filework {
 	 
 	        try {
 	            //Записываем текст у файл
-	            out.print(text);
+	            out.print(text.toString());
 	        } finally {
 	            //После чего мы должны закрыть файл
 	            //Иначе файл не запишется
@@ -37,8 +37,7 @@ public class Filework {
 	
 	public static String read(String fileName) {
 		byte[] str = null;
-		String text = null;
-		
+		String text = null;		
 		try {
 			FileInputStream inFile = new FileInputStream(fileName);
 			str = new byte[inFile.available()];
