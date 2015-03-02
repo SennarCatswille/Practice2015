@@ -48,6 +48,7 @@ public class gui {
 	private String filepath = null, dirpath = null;
 	private JLabel dbAnswer = new JLabel();
 	private boolean radioFlag = false;
+	private String butName = null;
 	
 	public void createGUI(Logs l) {
 		logs = l;
@@ -175,7 +176,6 @@ public class gui {
 						dbAnswer.setIcon(createIcon("image/bad.png"));
 						dbAnswer.setText(" Неудача!");
 					} catch (ClassNotFoundException e1) {
-						// TODO Auto-generated catch block
 						e1.printStackTrace();
 					}        	        
         	        
@@ -226,6 +226,8 @@ public class gui {
 	}
 	
 	private JPanel createPanel1() {
+		ActionListener act1 = new ChooseDir();
+		dirpath = "";
 		aPanel = new JPanel();
 		aPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		JLabel labelChoose = new JLabel();
@@ -234,25 +236,19 @@ public class gui {
 		
 		JButton fChoose = new JButton("Выбрать директорию...");
 		fChoose.setCursor(hand);
-		fChoose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser diropen = new JFileChooser();         
-                diropen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int ret = diropen.showDialog(null, "Выбрать папку");                
-                if (ret == JFileChooser.APPROVE_OPTION) {
-                	File file = diropen.getSelectedFile();
-                    dirpath = file.getPath();
-                }
-            }
-        });		
+		fChoose.addActionListener(act1);			
 		aPanel.add(labelChoose);
 		aPanel.add(fChoose);
 		aPanel.setPreferredSize(new Dimension(200, 75));
 		aPanel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createEtchedBorder(EtchedBorder.LOWERED), BorderFactory.createEmptyBorder(3, 3, 3, 3)));
 		return aPanel;
-	}
+	}	
 	
 	private JPanel createPanel2() {
+		ActionListener act1 = new ChooseDir();
+		ActionListener act2 = new ChooseFile();
+		dirpath = "";
+		filepath = "";
 		bPanel = new JPanel();
 		bPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 		JLabel blabelChoose = new JLabel();
@@ -260,34 +256,14 @@ public class gui {
 		JButton bfChoose = new JButton("Выбрать файл...");
 		bfChoose.setCursor(hand);
 		
-		bfChoose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser fileOpen = new JFileChooser();     
-                fileOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
-                int ret = fileOpen.showDialog(null, "Открыть файл");                
-                if (ret == JFileChooser.APPROVE_OPTION) {
-                	File file = fileOpen.getSelectedFile();
-                    filepath = file.getPath();                   
-                }
-            }
-        });		
+		bfChoose.addActionListener(act2);		
 		JLabel сlabelChoose = new JLabel();
 		сlabelChoose.setText("Выберите место сохранения:");
 		сlabelChoose.setAlignmentX(JComponent.LEFT_ALIGNMENT);
 		
 		JButton сfChoose = new JButton("Выбрать директорию...");
 		сfChoose.setCursor(hand);
-		сfChoose.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                JFileChooser dirOpen = new JFileChooser();
-                dirOpen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-                int ret = dirOpen.showDialog(null, "Выбрать папку");                
-                if (ret == JFileChooser.APPROVE_OPTION) {
-                	File file = dirOpen.getSelectedFile();
-                    dirpath = file.getPath();
-                }
-            }
-        });		
+		сfChoose.addActionListener(act1);		
 		bPanel.add(blabelChoose);
 		bPanel.add(bfChoose);
 		bPanel.add(сlabelChoose);
@@ -307,6 +283,62 @@ public class gui {
 		gbc.anchor = GridBagConstraints.CENTER;
 		gbl.setConstraints(confirmButton, gbc);
 		return confirmButton;
+	}
+	
+	private class ChooseDir implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser diropen = new JFileChooser();         
+            diropen.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+            int ret = diropen.showDialog(null, "Выбрать папку");                
+            if (ret == JFileChooser.APPROVE_OPTION) {
+            	File file = diropen.getSelectedFile();
+                dirpath = file.getPath();
+                Object button = e.getSource();
+                if(button instanceof JButton){
+                    if (!dirpath.isEmpty()) {
+                    	int t = 0;
+            			int k = 0;
+            			while (t != -1) {
+            				k = t;
+            				t = dirpath.indexOf("\\", t+1);
+            			}
+            			Dimension dim = ((JButton)button).getPreferredSize();
+            			((JButton)button).setText(dirpath.substring(k));
+            			((JButton)button).setPreferredSize(dim);
+            			((JButton)button).updateUI();
+                    }
+                 }
+            }			
+		}
+	}
+	
+	private class ChooseFile implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JFileChooser fileOpen = new JFileChooser();     
+            fileOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int ret = fileOpen.showDialog(null, "Открыть файл");                
+            if (ret == JFileChooser.APPROVE_OPTION) {
+            	File file = fileOpen.getSelectedFile();
+                filepath = file.getPath(); 
+                Object button = e.getSource();
+                if(button instanceof JButton){
+                    if (!filepath.isEmpty()) {
+                    	int t = 0;
+            			int k = 0;
+            			while (t != -1) {
+            				k = t;
+            				t = filepath.indexOf("\\", t+1);
+            			}
+            			Dimension dim = ((JButton)button).getPreferredSize();
+            			((JButton)button).setText(filepath.substring(k+1));
+            			((JButton)button).setPreferredSize(dim);
+            			((JButton)button).updateUI();
+                    }
+                 }
+            }
+		}
 	}
 	
 	private class RadioAction implements ActionListener {
