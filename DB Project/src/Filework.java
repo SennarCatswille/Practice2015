@@ -18,10 +18,8 @@ public class Filework {
 	        if(!file.exists()){
 	            file.createNewFile();
 	        }
-	 
 	        //PrintWriter обеспечит возможности записи в файл
-	        PrintWriter out = new PrintWriter(file.getAbsoluteFile());
-	 
+	        PrintWriter out = new PrintWriter(file.getAbsoluteFile());	 
 	        try {
 	            //Записываем текст у файл
 	            out.print(text.toString());

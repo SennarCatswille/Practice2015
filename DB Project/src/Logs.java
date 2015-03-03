@@ -7,8 +7,9 @@ import javax.swing.JTextArea;
  *
  */
 public class Logs {
-	JTextArea logs = null;
-	public final static String newLine = System.getProperty("line.separator");
+	private JTextArea logs = null;
+	private JFrame form = null;	
+	private final static String newLine = System.getProperty("line.separator");
 	
 	public void addMsg (String msg) {
 		logs.append(msg + newLine);
@@ -16,7 +17,7 @@ public class Logs {
 	}
 	
 	public void createLogFrame() {
-		JFrame form = new JFrame ("Лог действий");
+		form = new JFrame ("Лог действий");
 		form.setSize(500, 300);
 		form.setResizable(false);
 		

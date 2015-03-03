@@ -65,13 +65,21 @@ public class userDataBase {
 	public int analysis (String foname) {
 		StringBuilder workstr = new StringBuilder();
 		StringBuilder tablestr = new StringBuilder();
-		ArrayList<String> notEl= new ArrayList<String>();
+		// Для отсутствующих элементов
+		ArrayList<String> notElSchemes = new ArrayList<String>();
+		ArrayList<String> notElTables = new ArrayList<String>();
+		ArrayList<String> notElColumns = new ArrayList<String>();
+		ArrayList<String> notElFKeys = new ArrayList<String>();
+		ArrayList<String> notElPKeys = new ArrayList<String>();
+		// Для лишних элементов
+		ArrayList<String> elSchemes = new ArrayList<String>();
+		ArrayList<String> elTables = new ArrayList<String>();
+		ArrayList<String> elColumns = new ArrayList<String>();
+		ArrayList<String> elFKeys = new ArrayList<String>();
+		ArrayList<String> elPKeys = new ArrayList<String>();
 		int pos = 0;
 		l.addMsg("Начинаю анализ базы данных...");
 		try {
-			//почитать про StringBuilder
-			//основной стрингбилдер - файл
-			//
 			dbmeta = con.getMetaData();
 			ArrayList<String> ss = Schemes();
 			for (int i = 0; i < ss.size(); i++) {
@@ -80,7 +88,7 @@ public class userDataBase {
 			// Ищем схему
 				pos = text.indexOf(sname);
 				if (pos == -1) {
-					notEl.add("Отсутствует схема " + sname + System.getProperty("line.separator"));
+					elSchemes.add(sname + System.getProperty("line.separator"));
 					continue;
 				}					
 				l.addMsg("Анализирую схему " + Integer.toString(i+1) + "/" + Integer.toString(ss.size()) + " [" + sname + "]");
@@ -103,7 +111,7 @@ public class userDataBase {
 					String tname = rs.getString(3);
 					pos = workstr.indexOf("T:" + tname);
 					if (pos == -1) {
-						notEl.add(TableToString(tname, sname, false));
+						notElTables.add(TableToString(tname, sname, false));
 						continue;
 					}
 					int wnext = workstr.indexOf("T:", pos+2);
@@ -113,11 +121,12 @@ public class userDataBase {
 						workstr.delete(pos, workstr.length());
 					} else {
 						tablestr.append(workstr.substring(pos + tname.length() + 2, wnext));
-						TrimStringBuilder(tablestr);
 						workstr.delete(pos, wnext);
 					}
+					TrimStringBuilder(tablestr);
 					//workstr = workstr.substring(tname.length()+2).trim();
 					// Проверка индексов
+					/*
 					ArrayList<String> ind = Indexes(sname, tname);
 					for (int j = 0; j < ind.size(); j++) {
 						//tempstr = text.substring(0, text.indexOf(":", 3)-2);
@@ -132,18 +141,18 @@ public class userDataBase {
 							TrimStringBuilder(tablestr);
 						} else tablestr.delete(0, tablestr.length());
 					}
-					ind = null;
+					ind = null;*/
 					// Проверка полей таблиц
 					ArrayList<String> col = Tables(sname, tname);
 					for (int j = 0; j < col.size(); j++) {
 						String tcol = col.get(j);
 						pos = tablestr.indexOf(tcol);
 						if (pos == -1) {
-							notEl.add(ColumnToString(col.get(j), tname, false));
+							notElColumns.add(ColumnToString(col.get(j), tname, false, sname));
 							continue;
 						}
 						if (col.get(j).length() != tablestr.length()) {
-							tablestr.delete(pos, tcol.length());		
+							tablestr.delete(pos, tcol.length() + pos + 1);		
 							TrimStringBuilder(tablestr);
 						} else tablestr.delete(0, tablestr.length());
 					}
@@ -154,11 +163,15 @@ public class userDataBase {
 						String tkey = key.get(j);
 						pos = tablestr.indexOf(tkey);
 						if (pos == -1) {
-							notEl.add(KeyToString(key.get(j), false));
+							if (tkey.substring(0, 2).equals("P:")) {
+								notElPKeys.add(PKeyToString(key.get(j), false, sname));
+							} else {
+								notElFKeys.add(FKeyToString(key.get(j), false, sname));
+							}
 							continue;
 						}
 						if (key.get(j).length() != tablestr.length()) {
-							tablestr.delete(pos, tkey.length());
+							tablestr.delete(pos, tkey.length() + pos + 1);
 							TrimStringBuilder(tablestr);
 						} else tablestr.delete(0, tablestr.length());
 					}
@@ -175,10 +188,10 @@ public class userDataBase {
 							} else {
 								t = tablestr.toString();
 							}
-							if (c.equals("I:"))	notEl.add(IndexToString(t, tname, true));
-							if (c.equals("C:")) notEl.add(ColumnToString(t, tname, true));
-							if (c.equals("P:")) notEl.add(KeyToString(t, true));
-							if (c.equals("F:")) notEl.add(KeyToString(t, true));
+							//if (c.equals("I:"))	notEl.add(IndexToString(t, tname, true));
+							if (c.equals("C:")) elColumns.add(ColumnToString(t, tname, true, sname));
+							if (c.equals("P:")) elPKeys.add(PKeyToString(t, true, sname));
+							if (c.equals("F:")) elFKeys.add(FKeyToString(t, true, sname));
 							tablestr.delete(0, t.length());
 							TrimStringBuilder(tablestr);
 							//c = tablestr.substring(0, 2);
@@ -186,17 +199,78 @@ public class userDataBase {
 					//}					
 				}				
 			}
-			if (!notEl.isEmpty()){
+			l.addMsg("Анализ окончен!");
+			if (!(notElSchemes.isEmpty() && notElTables.isEmpty() && notElColumns.isEmpty() && notElFKeys.isEmpty() && notElPKeys.isEmpty())){
+				l.addMsg("Формирую выходной файл...");
+				char tab = '\u0009';
+				String ls = System.getProperty("line.separator");
 				BufferedWriter  out = new BufferedWriter(new FileWriter(foname));
-				for (int i = 0; i < notEl.size(); i++) {
-					out.write(notEl.get(i));
+				if (!notElSchemes.isEmpty() || !elSchemes.isEmpty()) {
+					if (notElSchemes.size() == 1) out.write("Отсутствует схема:" + ls);
+						else if (notElSchemes.size() > 1) out.write("Отсутствуют схемы:" + ls);
+					for (String item : notElSchemes) {
+						out.write(tab + item);
+					}
+					if (elSchemes.size() == 1) out.write("Лишняя схема:" + ls);
+						else if (elSchemes.size() > 1) out.write("Лишние схемы:" + ls);
+					for (String item : elSchemes) {
+						out.write(tab + item);
+					}
+				}
+				if (!notElTables.isEmpty() || !elTables.isEmpty()) {
+					if (notElTables.size() == 1) out.write("Отсутствует таблица:" + ls);
+						else if (notElTables.size() > 1) out.write("Отсутствуют таблицы:" + ls);
+					for (String item : notElTables) {
+						out.write(tab + item);
+					}
+					if (elTables.size() == 1) out.write("Лишняя таблица:" + ls);
+						else if (elTables.size() > 1) out.write("Лишние таблицы:" + ls);
+					for (String item : elTables) {
+						out.write(tab + item);
+					}
+				}
+				if (!notElColumns.isEmpty() || !elColumns.isEmpty()) {
+					if (notElColumns.size() == 1) out.write("Отсутствует поле:" + ls);
+						else if (notElColumns.size() > 1) out.write("Отсутсвуют поля:" + ls);
+					for (String item : notElColumns) {
+						out.write(tab + item);
+					}
+					if (elColumns.size() == 1) out.write("Лишнее поле:" + ls);
+						else if (elColumns.size() > 1) out.write("Лишние поля:" + ls);
+					for (String item : elColumns) {
+						out.write(tab + item);
+					}
+				}
+				if (!notElPKeys.isEmpty() || !elPKeys.isEmpty()) {
+					if (notElPKeys.size() == 1) out.write("Отсутствует первичный ключ:" + ls);
+						else if (notElPKeys.size() > 1) out.write("Отсутствуют первичные ключи:" + ls);
+					for (String item : notElPKeys) {
+						out.write(tab + item);
+					}
+					if (elPKeys.size() == 1) out.write("Лишний первичный ключ:" + ls);
+						else if (elPKeys.size() > 1) out.write("Лишние первичные ключи:" + ls);
+					for (String item : elPKeys) {
+						out.write(tab + item);
+					}
+				}
+				if (!notElFKeys.isEmpty() || !elFKeys.isEmpty()) {
+					if (notElFKeys.size() == 1) out.write("Отсутствует внешний ключ:" + ls);
+						else if (notElFKeys.size() > 1) out.write("Отсутствуют внешние ключи:" + ls);
+					for (String item : notElFKeys) {
+						out.write(tab + item);
+					}
+					if (elFKeys.size() == 1) out.write("Лишний внешний ключ:" + ls);
+						else if (elFKeys.size() > 1) out.write("Лишние внешние ключи:" + ls);
+					for (String item : elFKeys) {
+						out.write(tab + item);
+					}
 				}
 				out.flush();
 				out.close();
-				//l.addMsg("Программа завершена! Созданный файл находится по адресу " + foname);
+				l.addMsg("Программа завершена! Созданный файл находится по адресу " + foname);
 				return 1;
 			} else {
-				//l.addMsg("Пользовательская база данных идентична эталонной!");
+				l.addMsg("Пользовательская база данных идентична эталонной!");
 				return 0;
 			}	
 		} catch (SQLException e) {
@@ -228,6 +302,7 @@ public class userDataBase {
 	}
 	
 	// Преобразование для вывода в файл индекса
+	/*
 	private String IndexToString (String ind, String tn, boolean mark) {
 		ind = ind.substring(2);
 		String[] a = ind.split(" ");
@@ -249,32 +324,28 @@ public class userDataBase {
 		str += "в таблице " + tn + "." + System.getProperty("line.separator");
 		return str;
 	}
-	
+	*/
 	// Преобразование для вывода в файл поля
-	private String ColumnToString (String col, String tn, boolean mark) {
+	private String ColumnToString (String col, String tn, boolean mark, String sn) {
 		col = col.substring(2);
 		String a[] = col.split(" ");
-		String str = "В таблице " + tn;
-		if (mark) {
+		String str = sn + "." + tn + " " + a[0] + " " + a[1].toString() + "(" + a[2] + ")";
+		/*if (mark) {
 			str += " отсутствует поле " + a[0];
 		} else {
 			str += " найдено лишнее поле " + a[0];
 		}
 		str += " с типом " + a[1];
 		str += " размером " + a[2] + " байт, ";
-		if (a[3].equals("0")) str += "не допустимы пустые значения.";
-		if (a[3].equals("1")) str += "пустые значения допустимы.";
-		
+		*/
 		str += System.getProperty("line.separator");
 		return str;
 	}
 	// Преобразование информации о ключе для вывода в файл
-	private String KeyToString(String key, boolean mark) {
-		String fp = key.substring(0, 2);
-		key = key.substring(2);
+	private String PKeyToString(String key, boolean mark, String sn) {
 		String a[] = key.split(" ");
-		String str = "В таблице " + a[0];
-		if (mark) {
+		String str = sn + "." + a[0] + a[1] + System.getProperty("line.separator");
+		/*if (mark) {
 			str += " отсутствует ";
 		} else {
 			str += " найден лишний ";
@@ -284,24 +355,30 @@ public class userDataBase {
 		} else if (fp.equals("F:")) {
 			str += "внешний ключ " + a[1];
 			str += " к таблице " + a[2] + " (" + a[3] + ").";
-		}
-		str += System.getProperty("line.separator");
+		}*/
+		return str;
+	}
+	
+	private String FKeyToString(String key, boolean mark, String sn) {
+		String a[] = key.split(" ");
+		String str = sn + "." + a[0] + " " + a[1] + " - " + a[2] + "(" + a[3] + ")" + System.getProperty("line.separator");
 		return str;
 	}
 	
 	// Преобразование информации о таблице для вывода в файл
 	private String TableToString(String tn, String sn, boolean mark) {
 		String str = null;
-		if (mark) {
+		str = sn + "." + tn + System.getProperty("line.separator");
+		/*if (mark) {
 			str = "Отсутствует таблица " + tn;
 		} else {
 			str = "Найдена лишняя таблица " + tn;
-		}
-		str += " в схеме " + sn + "." + System.getProperty("line.separator");
+		}*/
 		return str;
 	}
-		
+	
 	// Инфа об индексах
+	/*
 	private ArrayList<String> Indexes (String sname, String tname) throws SQLException {
 		String str = null;
 		ArrayList<String> al = new ArrayList<String>();
@@ -314,7 +391,7 @@ public class userDataBase {
 			al.add(str.trim());
 		}	
 		return al;		
-	}
+	}*/
 	// Схемы
 	private ArrayList<String> Schemes () throws SQLException {
 		ArrayList<String> al = new ArrayList<String>();

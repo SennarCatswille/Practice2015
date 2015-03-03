@@ -48,7 +48,6 @@ public class gui {
 	private String filepath = null, dirpath = null;
 	private JLabel dbAnswer = new JLabel();
 	private boolean radioFlag = false;
-	private String butName = null;
 	
 	public void createGUI(Logs l) {
 		logs = l;
@@ -357,6 +356,17 @@ public class gui {
 		}		
 	}
 	
+	private void UpdateButtons() {
+		if (Radio1.isSelected()) {
+			cPanel.remove(aPanel);
+			cPanel.add(createPanel1());
+		} else if (Radio2.isSelected()) {
+			cPanel.remove(bPanel);
+			cPanel.add(createPanel2());
+		}
+		cPanel.updateUI();
+	}
+	
 	private String[] checkDB() {
 		String[] dbauth = new String[4];
 		dbauth[0] = new String(dbHost.getText());
@@ -422,9 +432,9 @@ public class gui {
 						String str = "Сравнение успешно завершено!";
 						if (flag != -1) {
 							if (flag == 1) {
-								str += "Программа завершена! Созданный файл находится в " + dirpath;
+								//str += "Программа завершена! Созданный файл находится в " + dirpath;
 							} else {
-								str += "Сравниваемые базы данных идентичны!";
+								//str += "Сравниваемые базы данных идентичны!";
 							}
 							
 						} else {
@@ -435,6 +445,7 @@ public class gui {
 				}
 			dirpath = "";
 			filepath = "";
+			UpdateButtons();
 			}
 		}
 	}

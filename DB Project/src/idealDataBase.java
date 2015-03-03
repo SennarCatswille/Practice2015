@@ -78,7 +78,7 @@ public class idealDataBase {
 					//String tname = rs.getString(3);
 					try {						
 						text.append(" T:").append(tname);
-						Indexes(sname, tname);
+						//Indexes(sname, tname);
 						Tables(sname, tname);
 						Keys(sname, tname);	
 					} catch (IOException e) {
@@ -96,7 +96,7 @@ public class idealDataBase {
 		}		
 		return false;
 	}
-	
+	/*
 	// »нфа об индексах
 	private void Indexes (String sname, String tname) throws SQLException, IOException {
 		ResultSet dbindex = dbmeta.getIndexInfo(null, sname, tname, false, false);
@@ -106,7 +106,7 @@ public class idealDataBase {
 			text.append(" ").append(dbindex.getString("ORDINAL_POSITION"));
 			text.append(" ").append(dbindex.getString("TYPE"));
 		}	
-	}
+	}*/
 	// —хемы
 	private ArrayList<String> Schemes () throws SQLException {
 		ArrayList<String> al = new ArrayList<String>();
