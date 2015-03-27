@@ -60,7 +60,7 @@ public class ExtraEl {
 		ArrayList<String> str = new ArrayList<>();
 		for (Keys k : keys) {
 			if (k.getKeyType() == 2) {
-				str.add(k.getSchemeTable() + " " + k.getKeyName() + " (" + k.getFKeyName() + ")");
+				str.add(k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + " - " + k.getFTable() + " (" + k.getFKeyName() + ")");
 			}
 		}
 		return str;
@@ -70,18 +70,69 @@ public class ExtraEl {
 		ArrayList<String> str = new ArrayList<>();
 		for (Keys k : keys) {
 			if (k.getKeyType() == 1) {
-				str.add(k.getSchemeTable() + " " + k.getKeyName() + nl);
+				str.add(k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + nl);
 			}
 		}
 		return str;
 	}
 	
 	public void OutInfo(BufferedWriter out) throws IOException {
+		ArrayList<String> outStr = null;
 		if (!schemes.isEmpty()) {
+			outStr = getSchemes();
 			if (schemes.size() == 1) {
-				out.write("Отсутствует схема" + nl);
+				out.write("Отсутствует схема:" + nl);
 			} else {
-				out.write("Отсутствуют схемы" + nl);
+				out.write("Отсутствуют схемы:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
+		if (!tables.isEmpty()) {
+			outStr = getTables();
+			if (tables.size() == 1) {
+				out.write("Отсутсвует таблица:" + nl);
+			} else {
+				out.write("Отсутствуют таблицы:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
+		if (!columns.isEmpty()) {
+			outStr = getColumns();
+			if (columns.size() == 1) {
+				out.write("Отсутствует поле:" + nl);
+			} else {
+				out.write("Отсутствуют поля:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
+		if (!keys.isEmpty()) {
+			outStr = getPKeys();
+			if (!outStr.isEmpty()) {
+				if (outStr.size() == 1) {
+					out.write("Отсутсвует первичный ключ:" + nl);
+				} else {
+					out.write("Отсутствуют первичные ключи: " + nl);
+				}
+				for (String str : outStr) {
+					out.write(str);
+				}
+			}
+			outStr = getFKeys();
+			if (!outStr.isEmpty()) {
+				if (outStr.size() == 1) {
+					out.write("Отсутствует внешний ключ:" + nl);
+				} else {
+					out.write("Отсутствуют внешние ключи:" + nl);
+				}
+				for (String str : outStr) {
+					out.write(str);
+				}
 			}
 		}
 	}

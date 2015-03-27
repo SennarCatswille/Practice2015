@@ -11,7 +11,9 @@ public class Keys {
 	private int keyType; // 1 - primary, 2 - foreign
 	private String keyName;
 	private String fKeyName;
-	private String schemeTable;
+	private String scheme;
+	private String pTable;
+	private String fTable;
 	
 	public Keys(int t, String n) {
 		keyType = t;
@@ -50,7 +52,15 @@ public class Keys {
 		return fKeyName;
 	}
 	
-	public String getSchemeTable() {
-		return schemeTable;
+	public String getScheme() {
+		return scheme;
+	}
+	
+	public String getPTable() {
+		return pTable;
+	}
+	
+	public String getFTable() {
+		return fTable;
 	}
 }
