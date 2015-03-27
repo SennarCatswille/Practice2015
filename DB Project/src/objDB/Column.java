@@ -10,6 +10,7 @@ package objDB;
 public class Column {
 	private String colName;
 	private String typeName;
+	private String SchemeTable;
 	private int size;
 	
 	public Column(String c, String t, int s) {
@@ -35,6 +36,10 @@ public class Column {
 	
 	public String getType() {
 		return typeName;
+	}
+	
+	public String getSchemTable() {
+		return SchemeTable;
 	}
 	
 	public int getSize() {
