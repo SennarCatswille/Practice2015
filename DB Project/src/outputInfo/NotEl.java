@@ -35,4 +35,20 @@ public class NotEl {
 	public void addKeys(Keys k) {
 		keys.add(k);
 	}
+	
+	public ArrayList<Scheme> getSchemes() {
+		return schemes;
+	}
+	
+	public ArrayList<Table> getTables() {
+		return tables;
+	}
+	
+	public ArrayList<Column> getColumns() {
+		return columns;
+	}
+	
+	public ArrayList<Keys> getKeys() {
+		return keys;
+	}
 }
