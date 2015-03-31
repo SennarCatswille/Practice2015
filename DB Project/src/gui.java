@@ -26,6 +26,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import utils.DBWork;
+
 /**
  * @author Sennar
  *
@@ -162,22 +164,13 @@ public class gui {
             public void actionPerformed(ActionEvent e) {
                 String[] dbInfo = checkDB();
                 if (dbInfo != null) {
-					try {
-						Class.forName("com.ibm.db2.jcc.DB2Driver");						
-						String strcon = "jdbc:db2://" + dbInfo[0] + "/" + dbInfo[1];
-						Connection con = DriverManager.getConnection(strcon, dbInfo[2], dbInfo[3]);					
-						if (con != null) {
-							dbAnswer.setIcon(createIcon("image/good.png"));
-							dbAnswer.setText(" Успешно!");
-						}
-						con = null;
-					} catch (SQLException e1) {
-						dbAnswer.setIcon(createIcon("image/bad.png"));
+                	if (DBWork.TestDB(dbInfo)) {
+                		dbAnswer.setIcon(createIcon("image/good.png"));
+						dbAnswer.setText(" Успешно!");
+                	} else {
+                		dbAnswer.setIcon(createIcon("image/bad.png"));
 						dbAnswer.setText(" Неудача!");
-					} catch (ClassNotFoundException e1) {
-						e1.printStackTrace();
-					}        	        
-        	        
+                	}        	        
                 }
             }
         });		

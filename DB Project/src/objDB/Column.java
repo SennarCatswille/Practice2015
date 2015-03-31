@@ -10,13 +10,15 @@ package objDB;
 public class Column {
 	private String colName;
 	private String typeName;
-	private String SchemeTable;
+	private String schemeTable;
 	private int size;
 	
-	public Column(String c, String t, int s) {
+	public Column(String c, String t, int s, String st) {
 		colName = new String(c);
 		typeName = new String(t);
+		schemeTable = st;
 		size = s;
+		
 	}
 	
 	public boolean equals(Column obj) {
@@ -39,7 +41,7 @@ public class Column {
 	}
 	
 	public String getSchemTable() {
-		return SchemeTable;
+		return schemeTable;
 	}
 	
 	public int getSize() {

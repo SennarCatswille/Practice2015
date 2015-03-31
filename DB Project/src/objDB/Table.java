@@ -19,8 +19,8 @@ public class Table {
 	ArrayList<Keys> keys = null;
 	
 	public Table(String n, String s, ArrayList<Column> c, ArrayList<Keys> k) {
-		tName = n;
-		sName = s;
+		tName = new String(n);
+		sName = new String(s);
 		columns = c;
 		keys = k;
 	}

@@ -15,16 +15,20 @@ public class Keys {
 	private String pTable;
 	private String fTable;
 	
-	public Keys(int t, String n) {
-		keyType = t;
+	public Keys(int t, String tab, String n, String schem) {
+		keyType = t; //- t = 1
+		pTable = new String(tab);
 		keyName = new String(n);
-		
+		scheme = new String(schem);
 	}
 	
-	public Keys(int t, String n, String f) {
-		keyType = t;
+	public Keys(int t, String n, String pTab, String f, String fTab, String schem) {
+		keyType = t; //- t = 2
 		keyName = new String(n);
+		pTable = new String(pTab);
 		fKeyName = new String(f);
+		fTable = new String(fTab);
+		scheme = new String(schem);
 	}
 	
 	public boolean equals(Keys obj) {
