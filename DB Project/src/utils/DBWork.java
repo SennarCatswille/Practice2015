@@ -17,29 +17,39 @@ import objDB.Scheme;
 import objDB.Table;
 
 /**
- * @author Кирилл
+ * @author Sennar
  *
  */
 public class DBWork {
-	private DataBase db = null;
-	private Connection con = null;
-	private DatabaseMetaData dbmeta = null;
-	private Logs l;
-	private boolean state = false;
-	private String[] conDB = new String[4];
+	private DataBase db = null; //- объект базы данных
+	private Connection con = null; //- подключение к базе данных
+	private DatabaseMetaData dbmeta = null; //- мета-данные о БД
+	private Logs l; //- объект логов программы
+	private boolean state = false; //- определяет состояние подключения к базе данных
+	private String[] conDB = new String[4]; //- массив данных о подключении к бд
 	
+	/*
+	 * Конструктор класса, передаем в него объект логов программы
+	 */
 	public DBWork(Logs temp) {
 		l = temp;
 	}
-	
-	public DataBase createObjDB(String host, String name, String user, String pass) {
+	/*
+	 * Основной метод - создание объекта базы данных
+	 * Принимает массив со следующей структурой:
+	 * [0] - хост
+	 * [1] - имя базы данных
+	 * [2] - пользователь
+	 * [3] - пароль
+	 */
+	public DataBase createObjDB(String[] dbInfo) {
 		ArrayList<Scheme> scheme = new ArrayList<>();
 		ArrayList<Table> table = new ArrayList<>();
 		ArrayList<Column> column = new ArrayList<>();
 		ArrayList<Keys> keys = new ArrayList<>();	
 		
-		conDB[0] = host; conDB[1] = name;
-		conDB[2] = user; conDB[3] = pass;
+		conDB = dbInfo;
+		
 		ConnectionToDB();
 		if (state) {
 			//- Если подключение установлено успешно, начинаем преобразование базы данных
@@ -68,7 +78,10 @@ public class DBWork {
 		
 		return db;
 	}
-	
+	/*
+	 * Получаем список таблиц схемы базы данных
+	 * Проверяем, не системные ли это таблицы по префиксу "SYS"
+	 */
 	private ArrayList<String> Tables(String s) throws SQLException {
 		ArrayList<String> str = new ArrayList<>();
 		ResultSet rs = dbmeta.getTables(null, s, "%", null);
@@ -79,7 +92,9 @@ public class DBWork {
 		}
 		return str;
 	}
-	
+	/*
+	 * Метод получения схем базы данных
+	 */
 	private ArrayList<String> Schemes() throws SQLException {
 		ArrayList<String> str = new ArrayList<>();
 		ResultSet schem = dbmeta.getSchemas();
@@ -88,7 +103,9 @@ public class DBWork {
 		}		
 		return str;
 	}
-	
+	/*
+	 * Получаем массив колонок таблицы
+	 */
 	private ArrayList<Column> Columns(String sname, String tname) throws SQLException {
 		ArrayList<Column> cols = new ArrayList<>();
 		ResultSet rs = dbmeta.getColumns(null, sname, tname, null);
@@ -100,7 +117,9 @@ public class DBWork {
 		}
 		return cols;
 	}
-	
+	/*
+	 * Получаем массив объектов - ключей таблицы
+	 */
 	private ArrayList<Keys> Keys(String sname, String tname) throws SQLException {
 		ArrayList<Keys> k = new ArrayList<>();
 		ResultSet rs = dbmeta.getPrimaryKeys(null, sname, tname);
@@ -121,7 +140,9 @@ public class DBWork {
 		}
 		return k;
 	}
-	
+	/*
+	 * Подключение к БД
+	 */
 	private void ConnectionToDB() {
 		boolean isDriverRegistred = false;
 		try {
@@ -166,8 +187,25 @@ public class DBWork {
 			return false;
 		}
 	}
-	
+	/*
+	 * Метод получения состояния подключения к базе данных
+	 */
 	public boolean getState() {
 		return state;
+	}
+	/*
+	 * Закрытие подключения
+	 */
+	public void close () {
+		if (con!= null)	{
+			try	{
+				con.commit();
+				con.close();
+			} catch (Exception e) {
+				l.addMsg("Проблема с закрытием подключения к DB2:");
+				l.addMsg(e.getStackTrace().toString());
+			}
+			con = null;
+		}
 	}
 }

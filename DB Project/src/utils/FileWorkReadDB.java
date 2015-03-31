@@ -9,7 +9,7 @@ import objDB.DataBase;
  * @author Кирилл
  *
  */
-public class FileWorkRead {
+public class FileWorkReadDB {
 	public static DataBase readDB (String path) {
 		return null;
 	}
