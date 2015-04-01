@@ -2,6 +2,8 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.io.*;
 
+import myutils.Logs;
+
 /**
  * @author Sennar
  *

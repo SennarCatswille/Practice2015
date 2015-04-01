@@ -1,7 +1,7 @@
 /**
  * Класс создания объекта базы данных
  */
-package utils;
+package myutils;
 
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
@@ -31,8 +31,8 @@ public class DBWork {
 	/*
 	 * Конструктор класса, передаем в него объект логов программы
 	 */
-	public DBWork(Logs temp) {
-		l = temp;
+	public DBWork(Logs log) {
+		l = log;
 	}
 	/*
 	 * Основной метод - создание объекта базы данных
@@ -58,18 +58,17 @@ public class DBWork {
 				ArrayList<String> schem = Schemes();
 				for (String s : schem) {
 					ArrayList<String> tab = Tables(s);
+					table = new ArrayList<>();
 					for (String t : tab) {
 						column = Columns(s, t);
 						keys = Keys(s, t);
 						table.add(new Table(t, s, column, keys));
-						column = null;
-						keys = null;
 					}
 					scheme.add(new Scheme(s, table));
 					table = null;
 				}
 				db = new DataBase(scheme);
-				scheme = null;
+				scheme.clear();
 			} catch (SQLException e) {
 				e.printStackTrace();
 			}
@@ -86,8 +85,9 @@ public class DBWork {
 		ArrayList<String> str = new ArrayList<>();
 		ResultSet rs = dbmeta.getTables(null, s, "%", null);
 		while (rs.next()) {
-			if (!(rs.getString(3).equals("SYS"))) {
-				str.add(rs.getString(3));
+			String tab = new String(rs.getString(3));
+			if (!(tab.indexOf("SYS") == 0)) {
+				str.add(tab);
 			}
 		}
 		return str;

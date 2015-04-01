@@ -17,8 +17,14 @@ public class Column {
 		colName = new String(c);
 		typeName = new String(t);
 		schemeTable = st;
-		size = s;
-		
+		size = s;		
+	}
+	
+	public Column(Column col) {
+		colName = col.getName();
+		typeName = col.getType();
+		schemeTable = col.getSchemTable();
+		size = col.getSize();
 	}
 	
 	public boolean equals(Column obj) {

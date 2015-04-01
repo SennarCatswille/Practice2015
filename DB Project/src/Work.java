@@ -1,3 +1,5 @@
+import myutils.Logs;
+
 /**
  * @author Sennar
  *

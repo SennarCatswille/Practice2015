@@ -17,13 +17,25 @@ public class Table {
 	private String sName;
 	ArrayList<Column> columns = null;
 	ArrayList<Keys> keys = null;
-	
+	/*
+	 * Основной конструктор класса
+	 */
 	public Table(String n, String s, ArrayList<Column> c, ArrayList<Keys> k) {
 		tName = new String(n);
 		sName = new String(s);
-		columns = c;
-		keys = k;
+		columns = new ArrayList<>(c);
+		keys = new ArrayList<>(k);
 	}
+	/*
+	 * Конструктор копирования класса
+	 */
+	public Table(Table t) {
+		tName = t.getTableName();
+		sName = t.getSchemeName();
+		columns = t.getColumns();
+		keys = t.getAllKeys();
+	}
+	
 	/**
 	 * Проверка столбцов и ключей, если сходится - удаляем,
 	 * если нет - заносим в лог и удаляем

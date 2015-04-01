@@ -1,7 +1,7 @@
 /**
  * Класс записи объекта базы данных в файл
  */
-package utils;
+package myutils;
 
 import java.util.ArrayList;
 
@@ -31,17 +31,17 @@ public class FileWorkWriteDB {
 		StringBuilder outStr = new StringBuilder();
 		ArrayList<Scheme> scheme = db.getSchemes();
 		ArrayList<Table> table = new ArrayList<>();
-		
+		l.addMsg("Начинаю вывод в файл");
 		for (Scheme s : scheme) {
 			outStr.append(" | " + s.getName());
 			table = s.getTables();
 			for (Table t : table) {
-				outStr.append(" " + t.getTableName());
+				outStr.append(" T:" + t.getTableName());
 				outStr.append(getStringColumn(t));
 				outStr.append(getStringKeys(t));
 			}
 		}
-		// методами составлять строку по кускам, сначала схему, таблицы, внутри таблиц сделать кусочек с ключами и т.д.
+		l.addMsg("Вывод окончен");
 		return outStr;
 	}
 	

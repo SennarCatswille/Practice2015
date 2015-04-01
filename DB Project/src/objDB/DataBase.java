@@ -19,7 +19,11 @@ public class DataBase {
 	private ArrayList<Scheme> schemes = null;
 	
 	public DataBase(ArrayList<Scheme> s) {
-		schemes = s;
+		schemes = new ArrayList<Scheme>(s);
+	}
+	
+	public DataBase(DataBase d) {
+		schemes = d.getSchemes();
 	}
 	
 	public boolean equals(DataBase db) {

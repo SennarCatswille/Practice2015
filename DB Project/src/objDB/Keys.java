@@ -31,6 +31,15 @@ public class Keys {
 		scheme = new String(schem);
 	}
 	
+	public Keys(Keys k) {
+		keyType = k.getKeyType();
+		keyName = k.getKeyName();
+		pTable = k.getPTable();
+		fKeyName = k.getFKeyName();
+		fTable = k.getFTable();
+		scheme = k.getScheme();
+	}
+	
 	public boolean equals(Keys obj) {
 		if (this.keyType == obj.getKeyType()) {
 			if (this.keyName.equals(obj.getKeyName())) {

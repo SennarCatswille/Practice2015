@@ -9,7 +9,7 @@ import java.io.PrintWriter;
  *
  */
 public class Filework {
-	public static void write(String fileName, StringBuilder text) {
+	public static boolean write(String fileName, StringBuilder text) {
 	    //Îןנוהוכÿול פאיכ
 	    File file = new File(fileName);
 	 
@@ -31,6 +31,7 @@ public class Filework {
 	    } catch(IOException e) {
 	        throw new RuntimeException(e);
 	    }
+	    return true;
 	}
 	
 	public static String read(String fileName) {

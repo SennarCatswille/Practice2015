@@ -14,11 +14,16 @@ import outputInfo.NotEl;
  */
 public class Scheme {
 	private String sName;
-	private ArrayList<Table> tables = null;
+	private ArrayList<Table> tables = new ArrayList<>();
 	
 	public Scheme(String n, ArrayList<Table> s) {
 		sName = new String(n);
-		tables = s;
+		tables = new ArrayList<>(s);
+	}
+	
+	public Scheme(Scheme s) {
+		sName = s.getName();
+		tables = s.getTables();
 	}
 	
 	public boolean equals(Scheme s, ExtraEl ee, NotEl ne) {

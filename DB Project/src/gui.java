@@ -23,7 +23,10 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
-import utils.DBWork;
+import objDB.DataBase;
+import myutils.DBWork;
+import myutils.FileWorkWriteDB;
+import myutils.Logs;
 
 /**
  * @author Sennar
@@ -394,10 +397,13 @@ public class gui {
 					}
 					logs.createLogFrame();
 					logs.addMsg("Приступаю к работе...");
-					idealDataBase db = new idealDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3]);
-					if (db.GetState()) {
+					DBWork db = new DBWork(logs);
+					DataBase db1 = db.createObjDB(dbInfo);
+					if (db.getState()) {
 						dirpath += "\\out.dat";
-						if (db.getMeta(dirpath)) {
+						FileWorkWriteDB fileDB = new FileWorkWriteDB(db1, logs);
+						StringBuilder DBString = fileDB.CreateFileDB();
+						if (Filework.write(dirpath, DBString)) {
 							db.close();
 							String str = "Программа успешно завершена! Созданный файл находится в " + dirpath;
 							logs.addMsg(str);
@@ -414,12 +420,14 @@ public class gui {
 					}
 					logs.createLogFrame();
 					logs.addMsg("Приступаю к работе...");
-					userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
-					if (db.GetState()) {
+					//userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
+					DBWork db = new DBWork(logs);
+					if (db.getState()) {
 						dirpath += "\\out.txt";
-						int flag = db.analysis(dirpath);
+						//int flag = db.analysis(dirpath);
 						db.close();		
 						String str = "Сравнение успешно завершено!";
+						int flag = 1;
 						if (flag != -1) {
 							if (flag == 1) {
 								//str += "Программа завершена! Созданный файл находится в " + dirpath;
