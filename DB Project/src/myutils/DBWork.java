@@ -99,8 +99,11 @@ public class DBWork {
 		ArrayList<String> str = new ArrayList<>();
 		ResultSet schem = dbmeta.getSchemas();
 		while (schem.next()) {
-			str.add(schem.getString("TABLE_SCHEM"));
-		}		
+			String s = new String(schem.getString("TABLE_SCHEM"));
+			if (!(s.indexOf("SYS") == 0)) {
+				str.add(s);			
+			}
+		}
 		return str;
 	}
 	/*

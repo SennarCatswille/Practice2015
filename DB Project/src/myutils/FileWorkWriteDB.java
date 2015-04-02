@@ -33,13 +33,14 @@ public class FileWorkWriteDB {
 		ArrayList<Table> table = new ArrayList<>();
 		l.addMsg("Начинаю вывод в файл");
 		for (Scheme s : scheme) {
-			outStr.append(" | " + s.getName());
+			outStr.append(s.getName());
 			table = s.getTables();
 			for (Table t : table) {
-				outStr.append(" T:" + t.getTableName());
-				outStr.append(getStringColumn(t));
+				outStr.append(" T:" + t.getTableName() + " ");
+				outStr.append(getStringColumn(t) + " ");
 				outStr.append(getStringKeys(t));
 			}
+			outStr.append(" | ");
 		}
 		l.addMsg("Вывод окончен");
 		return outStr;
@@ -50,7 +51,7 @@ public class FileWorkWriteDB {
 		StringBuilder str = new StringBuilder();
 		
 		for (Column c : col) {
-			str.append(" C:").append(c.getName()).append(c.getType()).append(c.getSize());
+			str.append(" C:").append(c.getName() + " ").append(c.getType() + " ").append(c.getSize());
 		}
 		
 		return str;

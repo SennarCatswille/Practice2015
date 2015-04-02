@@ -25,6 +25,7 @@ import javax.swing.border.EtchedBorder;
 
 import objDB.DataBase;
 import myutils.DBWork;
+import myutils.FileWorkReadDB;
 import myutils.FileWorkWriteDB;
 import myutils.Logs;
 
@@ -422,6 +423,7 @@ public class gui {
 					logs.addMsg("Приступаю к работе...");
 					//userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
 					DBWork db = new DBWork(logs);
+					DataBase db2 = FileWorkReadDB.readDB(filepath);
 					if (db.getState()) {
 						dirpath += "\\out.txt";
 						//int flag = db.analysis(dirpath);

@@ -16,6 +16,11 @@ public class Scheme {
 	private String sName;
 	private ArrayList<Table> tables = new ArrayList<>();
 	
+	public Scheme() {
+		sName = null;
+		tables = null;
+	}
+	
 	public Scheme(String n, ArrayList<Table> s) {
 		sName = new String(n);
 		tables = new ArrayList<>(s);
@@ -54,8 +59,16 @@ public class Scheme {
 		return true;		
 	}
 	
+	public void setName(String n) {
+		sName = new String(n);
+	}
+	
 	public String getName() {
 		return sName;
+	}
+	
+	public void setTables(ArrayList<Table> t) {
+		tables = new ArrayList<Table>(t);
 	}
 	
 	public ArrayList<Table> getTables() {

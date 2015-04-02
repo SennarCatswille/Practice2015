@@ -35,7 +35,15 @@ public class Table {
 		columns = t.getColumns();
 		keys = t.getAllKeys();
 	}
-	
+	/*
+	 * Пустой конструктор класса
+	 */
+	public Table() {
+		tName = null;
+		sName = null;
+		columns = null;
+		keys = null;
+	}
 	/**
 	 * Проверка столбцов и ключей, если сходится - удаляем,
 	 * если нет - заносим в лог и удаляем
@@ -85,7 +93,9 @@ public class Table {
 		}
 		return false;
 	}
-	
+	/*
+	 * Геттеры
+	 */
 	public String getTableName() {
 		return tName;
 	}
@@ -120,5 +130,23 @@ public class Table {
 	
 	public ArrayList<Column> getColumns() {
 		return columns;
+	}
+	/*
+	 * Сеттеры
+	 */
+	public void setTName(String t) {
+		tName = new String(t);
+	}
+	
+	public void setSName(String s) {
+		sName = new String(s);
+	}
+	
+	public void setColumns(ArrayList<Column> c) {
+		columns = new ArrayList<Column>(c);
+	}
+	
+	public void setKeys(ArrayList<Keys> k) {
+		keys = new ArrayList<Keys>(k);
 	}
 }

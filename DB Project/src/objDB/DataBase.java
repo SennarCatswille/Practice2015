@@ -29,6 +29,12 @@ public class DataBase {
 	public boolean equals(DataBase db) {
 		// идельаная.equals(пользовательская)
 		//- Сравнение баз данных
+		ArrayList<Scheme> badSchemes = db.getSchemes();
+		for (Scheme s : schemes) {
+			for (Scheme s2 : badSchemes) {
+				s.equals(s2, el, ne);
+			}
+		}
 		return true;
 	}
 	
