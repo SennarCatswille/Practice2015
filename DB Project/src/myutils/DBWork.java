@@ -53,10 +53,13 @@ public class DBWork {
 		ConnectionToDB();
 		if (state) {
 			//- Если подключение установлено успешно, начинаем преобразование базы данных
+			l.addMsg("Начинаю анализ базы данных!");
 			try {
 				dbmeta = con.getMetaData();
 				ArrayList<String> schem = Schemes();
+				int i = 1;
 				for (String s : schem) {
+					l.addMsg("Схема " + i + "/" + schem.size() + " [" + s + "]");
 					ArrayList<String> tab = Tables(s);
 					table = new ArrayList<>();
 					for (String t : tab) {
@@ -74,7 +77,7 @@ public class DBWork {
 			}
 			
 		}		
-		
+		l.addMsg("Анализ окончен!");
 		return db;
 	}
 	/*
@@ -147,6 +150,7 @@ public class DBWork {
 	 * Подключение к БД
 	 */
 	private void ConnectionToDB() {
+		l.addMsg("Устанавливаю связь с базой данных!");
 		boolean isDriverRegistred = false;
 		try {
 			Class.forName("com.ibm.db2.jcc.DB2Driver");	

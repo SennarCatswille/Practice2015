@@ -406,6 +406,7 @@ public class gui {
 					DataBase db1 = db.createObjDB(dbInfo);
 					if (db.getState()) {
 						dirpath += "\\out.dat";
+						logs.addMsg("Создаю файл на основе базы данных...");
 						FileWorkWriteDB fileDB = new FileWorkWriteDB(db1, logs);
 						StringBuilder DBString = fileDB.CreateFileDB();
 						if (Filework.write(dirpath, DBString)) {
@@ -429,7 +430,9 @@ public class gui {
 					//userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
 					DBWork db = new DBWork(logs);
 					DataBase db2 = db.createObjDB(dbInfo);
+					logs.addMsg("Считываю информацию о базе данных из файла...");
 					DataBase db1 = FileWorkReadDB.readDB(filepath);
+					logs.addMsg("Успешно! Начинаю сравнение...");
 					if (db.getState()) {
 						dirpath += "\\out.txt";
 						//int flag = db.analysis(dirpath);
@@ -463,7 +466,7 @@ public class gui {
 	}
 	
 	private ImageIcon createIcon(String path) {
-        java.net.URL imgURL = Work.class.getResource(path);    
+        java.net.URL imgURL = Main.class.getResource(path);    
         if (imgURL != null) {
             return new ImageIcon(imgURL);
         } else {
