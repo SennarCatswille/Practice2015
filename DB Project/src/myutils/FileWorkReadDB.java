@@ -66,7 +66,7 @@ public class FileWorkReadDB {
 				table = null;
 			}
 		} while (mainStr.length() > 1);
-		
+		db = new DataBase(scheme);
 		return db;
 	}
 	

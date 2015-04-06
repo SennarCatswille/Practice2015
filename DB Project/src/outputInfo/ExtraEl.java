@@ -13,6 +13,13 @@ public class ExtraEl {
 	private ArrayList<Column> columns = new ArrayList<Column>();
 	private ArrayList<Keys> keys = new ArrayList<Keys>();
 	
+	public boolean isEmpty() {
+		if ((schemes.size()!=0) || (tables.size()!=0) || (columns.size()!=0) || (keys.size()!=0)) {
+			return false;
+		}
+		return true;
+	}
+	
 	public void addScheme(Scheme s) {
 		schemes.add(s);
 	}

@@ -32,30 +32,30 @@ public class Scheme {
 	}
 	
 	public boolean equals(Scheme s, ExtraEl ee, NotEl ne) {
-		boolean flag = false;;
+		int flag = 0;
 		ArrayList<Table> tables2 = s.getTables();
 		if (this.sName.equals(s.getName())) {
 			for (int i = 0; i < tables.size(); i++) {
+				Table t1 = tables.get(i);
 				for (int j = 0; j < tables2.size(); j++) {
-					Table t1 = tables.get(i);
 					Table t2 = tables2.get(j);
 					if (t1.equalsTable(t2, ee, ne)) {
 						tables2.remove(j);
-						flag = true;
+						flag++;
 						break;
 					}
 				}
-				if (flag) {
-					ne.addTable(tables.get(i));
-					flag = false;
+				if (flag == 0) {
+					ne.addTable(t1);
 				}
+				flag = 0;
 			}
 			if (tables2.size() != 0) {
 				for (Table t : tables2) {
 					ee.addTable(t);
 				}
 			}
-		} 
+		} else return false;
 		return true;		
 	}
 	

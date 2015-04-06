@@ -19,6 +19,7 @@ import objDB.Table;
  */
 public class OutInfo {
 	private static String nl = System.getProperty("line.separator");
+	private static String tab = "    ";
 	private ArrayList<Scheme> schemes = new ArrayList<Scheme>();
 	private ArrayList<Table> tables = new ArrayList<Table>();
 	private ArrayList<Column> columns = new ArrayList<Column>();
@@ -44,33 +45,36 @@ public class OutInfo {
 	public int getFile(String foname) {
 		//l.addMsg("‘ормирую выходной файл...");
 		//char tab = '\u0009';
-		BufferedWriter out;
-		try {
-			out = new BufferedWriter(new FileWriter(foname));
-		} catch (IOException e) {
-			e.printStackTrace();
-			return 1;
+		if (!ee.isEmpty() || !ne.isEmpty()) {
+			BufferedWriter out;
+			try {
+				out = new BufferedWriter(new FileWriter(foname));
+			} catch (IOException e) {
+				e.printStackTrace();
+				return 1;
+			}
+			try {
+				ExtraOutInfo(out);
+				NotOutInfo(out);
+			} catch (IOException e) {
+				e.printStackTrace();
+				return 2;
+			}
+			try {
+				out.flush();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return 3;
+			}
+			try {
+				out.close();
+			} catch (IOException e) {
+				e.printStackTrace();
+				return 4;
+			}
+			return 0;
 		}
-		try {
-			ExtraOutInfo(out);
-			NotOutInfo(out);
-		} catch (IOException e) {
-			e.printStackTrace();
-			return 2;
-		}
-		try {
-			out.flush();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return 3;
-		}
-		try {
-			out.close();
-		} catch (IOException e) {
-			e.printStackTrace();
-			return 4;
-		}
-		return 0;
+		return -1;
 	}
 	
 	private ArrayList<String> getSchemes(Object obj) {
@@ -82,9 +86,8 @@ public class OutInfo {
 			schemes = ((NotEl) obj).getSchemes();
 		}
 		for (Scheme s : schemes) {
-			str.add(s.getName());
+			str.add(tab + s.getName());
 		}
-		schemes = null;
 		return str;
 	}
 	
@@ -97,9 +100,8 @@ public class OutInfo {
 			tables = ((NotEl) obj).getTables();
 		}
 		for (Table t : tables) {
-			str.add(t.getSchemeName() + "." + t.getTableName() + nl);
+			str.add(tab + t.getSchemeName() + "." + t.getTableName() + nl);
 		}
-		tables = null;
 		return str;
 	}
 	
@@ -112,9 +114,8 @@ public class OutInfo {
 			columns = ((NotEl) obj).getColumns();
 		}
 		for (Column c : columns) {
-			str.add(c.getSchemTable() + " " + c.getName() + " " + c.getType() + "(" + c.getSize() + ")" + nl);
+			str.add(tab + c.getSchemTable() + " " + c.getName() + " " + c.getType() + "(" + c.getSize() + ")" + nl);
 		}
-		columns = null;
 		return str;
 	}
 	
@@ -128,10 +129,9 @@ public class OutInfo {
 		}
 		for (Keys k : keys) {
 			if (k.getKeyType() == 2) {
-				str.add(k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + " - " + k.getFTable() + " (" + k.getFKeyName() + ")");
+				str.add(tab + k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + " - " + k.getFTable() + " (" + k.getFKeyName() + ")");
 			}
 		}
-		keys = null;
 		return str;
 	}
 	
@@ -145,17 +145,16 @@ public class OutInfo {
 		}
 		for (Keys k : keys) {
 			if (k.getKeyType() == 1) {
-				str.add(k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + nl);
+				str.add(tab + k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + nl);
 			}
 		}
-		keys = null;
 		return str;
 	}
 	
 	public void ExtraOutInfo(BufferedWriter out) throws IOException {
 		ArrayList<String> outStr = null;
+		outStr = getSchemes(ee);
 		if (!schemes.isEmpty()) {
-			outStr = getSchemes(ee);
 			if (schemes.size() == 1) {
 				out.write("Ћишн€€ схема:" + nl);
 			} else {
@@ -165,8 +164,8 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getTables(ee);
 		if (!tables.isEmpty()) {
-			outStr = getTables(ee);
 			if (tables.size() == 1) {
 				out.write("Ћишн€€ таблица:" + nl);
 			} else {
@@ -176,8 +175,8 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getColumns(ee);
 		if (!columns.isEmpty()) {
-			outStr = getColumns(ee);
 			if (columns.size() == 1) {
 				out.write("Ћишнее поле:" + nl);
 			} else {
@@ -187,8 +186,8 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getPKeys(ee);
 		if (!keys.isEmpty()) {
-			outStr = getPKeys(ee);
 			if (!outStr.isEmpty()) {
 				if (outStr.size() == 1) {
 					out.write("Ћишний первичный ключ:" + nl);
@@ -211,12 +210,13 @@ public class OutInfo {
 				}
 			}
 		}
+		clearAllArrayList();
 	}
 	
 	public void NotOutInfo(BufferedWriter out) throws IOException {
 		ArrayList<String> outStr = null;
+		outStr = getSchemes(ne);
 		if (!schemes.isEmpty()) {
-			outStr = getSchemes(ne);
 			if (schemes.size() == 1) {
 				out.write("ќтсутствует схема:" + nl);
 			} else {
@@ -226,8 +226,8 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getTables(ne);
 		if (!tables.isEmpty()) {
-			outStr = getTables(ne);
 			if (tables.size() == 1) {
 				out.write("ќтсутсвует таблица:" + nl);
 			} else {
@@ -237,8 +237,8 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getColumns(ne);
 		if (!columns.isEmpty()) {
-			outStr = getColumns(ne);
 			if (columns.size() == 1) {
 				out.write("ќтсутствует поле:" + nl);
 			} else {
@@ -248,8 +248,8 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getPKeys(ne);
 		if (!keys.isEmpty()) {
-			outStr = getPKeys(ne);
 			if (!outStr.isEmpty()) {
 				if (outStr.size() == 1) {
 					out.write("ќтсутсвует первичный ключ:" + nl);
@@ -272,5 +272,13 @@ public class OutInfo {
 				}
 			}
 		}
+		clearAllArrayList();
+	}
+	
+	private void clearAllArrayList() {
+		schemes = null;
+		tables = null;
+		columns = null;
+		keys = null;
 	}
 }

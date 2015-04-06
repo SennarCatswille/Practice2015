@@ -10,7 +10,7 @@ import java.io.PrintWriter;
  *
  */
 public class Filework {
-	public static void write(String fileName, StringBuilder text) {
+	public static boolean write(String fileName, StringBuilder text) {
 	    //Определяем файл
 	    File file = new File(fileName);
 	 
@@ -22,7 +22,7 @@ public class Filework {
 	        //PrintWriter обеспечит возможности записи в файл
 	        PrintWriter out = new PrintWriter(file.getAbsoluteFile());	 
 	        try {
-	            //Записываем текст у файл
+	            //Записываем текст в файл
 	            out.print(text.toString());
 	        } finally {
 	            //После чего мы должны закрыть файл
@@ -32,6 +32,7 @@ public class Filework {
 	    } catch(IOException e) {
 	        throw new RuntimeException(e);
 	    }
+	    return true;
 	}
 	
 	public static String read(String fileName) {

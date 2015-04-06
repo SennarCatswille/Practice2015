@@ -4,7 +4,7 @@ import myutils.Logs;
  * @author Sennar
  *
  */
-public class Work {
+public class Main {
 
 	/**
 	 * @param args

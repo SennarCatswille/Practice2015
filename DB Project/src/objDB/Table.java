@@ -50,21 +50,21 @@ public class Table {
 	 */
 	
 	public boolean equalsTable(Table t, ExtraEl ee, NotEl ne) {
-		boolean flag = false;
+		int flag = 0;
 		if (this.tName.equals(t.getTableName())) {
 			ArrayList<Column> c = t.getColumns(); 
 			for (int i = 0; i < columns.size(); i++) {
 				for (int j = 0; j < c.size(); j++) {
 					if (columns.get(i).equals(c.get(j))) {
 						c.remove(j);
-						flag = true;
+						flag++;
 						break;
 					}
 				}
-				if (flag) {
+				if (flag == 0) {
 					ne.addColumn(columns.get(i));
-					flag = false;
 				}
+				flag = 0;
 			}
 			if (c.size() != 0) {
 				for (Column col : c) {
@@ -72,26 +72,27 @@ public class Table {
 				}
 			}
 			ArrayList<Keys> k = t.getAllKeys();
+			flag = 0;
 			for (int i = 0; i < keys.size(); i++) {
 				for (int j = 0; j < k.size(); j++) {
 					if(keys.get(i).equals(k.get(j))) {
 						k.remove(j);
-						flag = true;
+						flag++;
 						break;
 					}
 				}
-				if (flag) {
+				if (flag == 0) {
 					ne.addKeys(keys.get(i));
-					flag = false;
 				}
+				flag = 0;
 			}
 			if (k.size() != 0) {
 				for (Keys key : k) {
 					ee.addKeys(key);
 				}
 			}
-		}
-		return false;
+		} else return false;
+		return true;
 	}
 	/*
 	 * Геттеры
@@ -143,10 +144,10 @@ public class Table {
 	}
 	
 	public void setColumns(ArrayList<Column> c) {
-		columns = new ArrayList<Column>(c);
+		columns = new ArrayList<>(c);
 	}
 	
 	public void setKeys(ArrayList<Keys> k) {
-		keys = new ArrayList<Keys>(k);
+		keys = new ArrayList<>(k);
 	}
 }

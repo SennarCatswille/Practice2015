@@ -23,10 +23,12 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTextField;
 import javax.swing.border.EtchedBorder;
 
+import outputInfo.OutInfo;
 import objDB.DataBase;
 import myutils.DBWork;
 import myutils.FileWorkReadDB;
 import myutils.FileWorkWriteDB;
+import myutils.Filework;
 import myutils.Logs;
 
 /**
@@ -51,7 +53,8 @@ public class gui {
 	private String filepath = null, dirpath = null;
 	private JLabel dbAnswer = new JLabel();
 	private boolean radioFlag = false;
-	
+	private OutInfo oi = null;
+		
 	public void createGUI(Logs l) {
 		logs = l;
 		hand = new Cursor(Cursor.HAND_CURSOR);
@@ -391,6 +394,7 @@ public class gui {
 		public void actionPerformed(ActionEvent arg0) {
 			String[] dbInfo = checkDB();
 			if (dbInfo != null) {
+				//- Если выбран анализ базы данных
 				if (Radio1.isSelected()) {
 					if (dirpath.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "Выберите место сохранения файла!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
@@ -410,6 +414,7 @@ public class gui {
 							logs.addMsg(str);
 						}
 					}
+				//- Если выбрано сравнение
 				} else if (Radio2.isSelected()) {
 					if (filepath.isEmpty()) {
 						JOptionPane.showMessageDialog(null, "Выберите файл эталонной базы данных!", "Ошибка выбора", JOptionPane.ERROR_MESSAGE);
@@ -423,23 +428,30 @@ public class gui {
 					logs.addMsg("Приступаю к работе...");
 					//userDataBase db = new userDataBase(logs, dbInfo[0], dbInfo[1], dbInfo[2], dbInfo[3], Filework.read(filepath));
 					DBWork db = new DBWork(logs);
-					DataBase db2 = FileWorkReadDB.readDB(filepath);
+					DataBase db2 = db.createObjDB(dbInfo);
+					DataBase db1 = FileWorkReadDB.readDB(filepath);
 					if (db.getState()) {
 						dirpath += "\\out.txt";
 						//int flag = db.analysis(dirpath);
-						db.close();		
-						String str = "Сравнение успешно завершено!";
-						int flag = 1;
-						if (flag != -1) {
-							if (flag == 1) {
-								//str += "Программа завершена! Созданный файл находится в " + dirpath;
-							} else {
-								//str += "Сравниваемые базы данных идентичны!";
-							}
-							
-						} else {
-							str = "Программа завершена с ошибкой! Попробуйте еще раз.";
-						}			
+						db1.equals(db2);
+						db.close();	
+						oi = new OutInfo(db1.getEE(), db1.getNE());
+						int flag = oi.getFile(dirpath);
+						String str = null;
+						switch (flag) {
+							case -1:
+								str = new String("Сравнение завершено! Базы данных идентичны!"); break;
+							case 0:
+								str = new String("Сравнение успешно завершено! Обнаружены различия. Они находятся в файле " + dirpath); break;
+							case 1:
+								str = new String("Ошибка открытия файла для записи!"); break;
+							case 2:
+								str = new String("Ошибка записи данных в файл!"); break;
+							case 3:
+								str = new String("Ошибка сохранения файла на диске!"); break;
+							case 4:
+								str = new String("Ошибка закрытия потока вывода!"); break;
+						}						
 						logs.addMsg(str);
 					}					
 				}
