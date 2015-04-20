@@ -86,7 +86,7 @@ public class OutInfo {
 			schemes = ((NotEl) obj).getSchemes();
 		}
 		for (Scheme s : schemes) {
-			str.add(tab + s.getName());
+			str.add(tab + s.getName() + nl);
 		}
 		return str;
 	}
@@ -129,7 +129,7 @@ public class OutInfo {
 		}
 		for (Keys k : keys) {
 			if (k.getKeyType() == 2) {
-				str.add(tab + k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + " - " + k.getFTable() + " (" + k.getFKeyName() + ")");
+				str.add(tab + k.getScheme() + "." + k.getPTable() + " " + k.getKeyName() + " - " + k.getFTable() + " (" + k.getFKeyName() + ")" + nl);
 			}
 		}
 		return str;
