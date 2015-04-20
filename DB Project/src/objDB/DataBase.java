@@ -77,4 +77,8 @@ public class DataBase {
 	public NotEl getNE() {
 		return ne;
 	}
+	
+	public PartialEl getPE() {
+		return pe;
+	}
 }

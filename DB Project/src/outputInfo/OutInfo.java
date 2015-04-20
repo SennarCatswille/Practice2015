@@ -1,5 +1,5 @@
 /**
- * Класс, объединяющий ExtraEl и NotEl в выводе файла
+ * Класс, объединяющий ExtraEl, NotEl и PartialEl в выводе файла
  */
 package outputInfo;
 
@@ -27,10 +27,12 @@ public class OutInfo {
 	
 	private ExtraEl ee = null;
 	private NotEl ne = null;
+	private PartialEl pe = null;
 	
-	public OutInfo(ExtraEl e, NotEl n) {
+	public OutInfo(ExtraEl e, NotEl n, PartialEl p) {
 		ee = e;
 		ne = n;
+		pe = p;
 	}
 	/*
 	 * Метод вывода файла результата
@@ -54,8 +56,8 @@ public class OutInfo {
 				return 1;
 			}
 			try {
+			//- Вывод в файл
 				ExtraOutInfo(out);
-				NotOutInfo(out);
 			} catch (IOException e) {
 				e.printStackTrace();
 				return 2;
@@ -107,14 +109,32 @@ public class OutInfo {
 	
 	private ArrayList<String> getColumns(Object obj) {
 		ArrayList<String> str = new ArrayList<>();
+		ArrayList<Column> col2 = new ArrayList<>();
+		int flag = 0;
 		if (obj instanceof ExtraEl) {
 			columns = ((ExtraEl) obj).getColumns();
 		}
 		if (obj instanceof NotEl) {
 			columns = ((NotEl) obj).getColumns();
 		}
-		for (Column c : columns) {
-			str.add(tab + c.getSchemTable() + " " + c.getName() + " " + c.getType() + "(" + c.getSize() + ")" + nl);
+		if (obj instanceof PartialEl) {
+			columns = ((PartialEl) obj).getReferenceFields();
+			col2 = ((PartialEl) obj).getPartialFields();
+			flag = 1;
+		}
+		if (flag == 0) {
+			for (Column c : columns) {
+				str.add(tab + c.getSchemTable() + " " + c.getName() + " " + c.getType() + "(" + c.getSize() + ")" + nl);
+			}
+		} else {
+			for (int i = 0; i < columns.size(); i++) {
+				StringBuilder newStr = new StringBuilder();
+				Column c1 = columns.get(i);
+				Column c2 = col2.get(i);
+				newStr.append(tab + c1.getSchemTable() + " " + c1.getName() + " " + c1.getType() + "(" + c1.getSize() + ") - ").
+				append(c2.getSchemTable() + " " + c2.getName() + " " + c2.getType() + "(" + c2.getSize() + ")" + nl);
+				str.add(newStr.toString());
+			}
 		}
 		return str;
 	}
@@ -164,6 +184,17 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getSchemes(ne);
+		if (!schemes.isEmpty()) {
+			if (schemes.size() == 1) {
+				out.write("Отсутствует схема:" + nl);
+			} else {
+				out.write("Отсутствуют схемы:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
 		outStr = getTables(ee);
 		if (!tables.isEmpty()) {
 			if (tables.size() == 1) {
@@ -175,12 +206,45 @@ public class OutInfo {
 				out.write(str);
 			}
 		}
+		outStr = getTables(ne);
+		if (!tables.isEmpty()) {
+			if (tables.size() == 1) {
+				out.write("Отсутсвует таблица:" + nl);
+			} else {
+				out.write("Отсутствуют таблицы:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
 		outStr = getColumns(ee);
 		if (!columns.isEmpty()) {
 			if (columns.size() == 1) {
 				out.write("Лишнее поле:" + nl);
 			} else {
-				out.write("Лищние поля:" + nl);
+				out.write("Лишние поля:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
+		outStr = getColumns(ne);
+		if (!columns.isEmpty()) {
+			if (columns.size() == 1) {
+				out.write("Отсутствует поле:" + nl);
+			} else {
+				out.write("Отсутствуют поля:" + nl);
+			}
+			for (String str : outStr) {
+				out.write(str);
+			}
+		}
+		outStr = getColumns(pe);
+		if (!columns.isEmpty()) {
+			if (columns.size() == 1) {
+				out.write("Несовпадающее поле:" + nl);
+			} else {
+				out.write("Несовпадающие поля:" + nl);
 			}
 			for (String str : outStr) {
 				out.write(str);
@@ -208,44 +272,6 @@ public class OutInfo {
 				for (String str : outStr) {
 					out.write(str);
 				}
-			}
-		}
-		clearAllArrayList();
-	}
-	
-	public void NotOutInfo(BufferedWriter out) throws IOException {
-		ArrayList<String> outStr = null;
-		outStr = getSchemes(ne);
-		if (!schemes.isEmpty()) {
-			if (schemes.size() == 1) {
-				out.write("Отсутствует схема:" + nl);
-			} else {
-				out.write("Отсутствуют схемы:" + nl);
-			}
-			for (String str : outStr) {
-				out.write(str);
-			}
-		}
-		outStr = getTables(ne);
-		if (!tables.isEmpty()) {
-			if (tables.size() == 1) {
-				out.write("Отсутсвует таблица:" + nl);
-			} else {
-				out.write("Отсутствуют таблицы:" + nl);
-			}
-			for (String str : outStr) {
-				out.write(str);
-			}
-		}
-		outStr = getColumns(ne);
-		if (!columns.isEmpty()) {
-			if (columns.size() == 1) {
-				out.write("Отсутствует поле:" + nl);
-			} else {
-				out.write("Отсутствуют поля:" + nl);
-			}
-			for (String str : outStr) {
-				out.write(str);
 			}
 		}
 		outStr = getPKeys(ne);

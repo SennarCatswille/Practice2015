@@ -438,7 +438,7 @@ public class gui {
 						//int flag = db.analysis(dirpath);
 						db1.equals(db2);
 						db.close();	
-						oi = new OutInfo(db1.getEE(), db1.getNE());
+						oi = new OutInfo(db1.getEE(), db1.getNE(), db1.getPE());
 						int flag = oi.getFile(dirpath);
 						String str = null;
 						switch (flag) {
