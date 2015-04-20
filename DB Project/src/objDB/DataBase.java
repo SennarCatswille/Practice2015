@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import outputInfo.ExtraEl;
 import outputInfo.NotEl;
+import outputInfo.PartialEl;
 
 /**
  * @author Кирилл
@@ -15,6 +16,7 @@ import outputInfo.NotEl;
 public class DataBase {
 	private ExtraEl ee;
 	private NotEl ne;
+	private PartialEl pe;
 	
 	private ArrayList<Scheme> schemes = null;
 	/*
@@ -43,7 +45,7 @@ public class DataBase {
 			Scheme s1 = schemes.get(i);
 			for (int j = 0; j < badSchemes.size(); j++) {
 				Scheme s2 = badSchemes.get(j);
-				if (s1.equals(s2, ee, ne)) {
+				if (s1.equals(s2, ee, ne, pe)) {
 					badSchemes.remove(j);
 					flag++;
 					break;

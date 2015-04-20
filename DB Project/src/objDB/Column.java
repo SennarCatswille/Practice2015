@@ -26,16 +26,23 @@ public class Column {
 		schemeTable = col.getSchemTable();
 		size = col.getSize();
 	}
-	
-	public boolean equals(Column obj) {
+	/*
+	 * Метод сравнения колонки
+	 * Возвращаемые значения:
+	 * 		0 - поля полностью различны
+	 * 		1 - поля идентичны
+	 * 		2 - поля неполностью одинаковы
+	 */
+	public int equals(Column obj) {
 		if (this.colName.equals(obj.getName())) {
-			if (this.typeName.equals(obj.getType())) {
-				if (this.size == obj.getSize()) {
-					return true;
-				}
+			if (this.typeName.equals(obj.getType()) && (this.size == obj.getSize())) {
+				return 1;
+			}
+			if (this.typeName.equals(obj.getType()) || (this.size == obj.getSize())) {
+				return 2;
 			}
 		}
-		return false;
+		return 0;
 	}
 	
 	public String getName() {

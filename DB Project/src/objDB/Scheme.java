@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import outputInfo.ExtraEl;
 import outputInfo.NotEl;
+import outputInfo.PartialEl;
 
 /**
  * @author Кирилл
@@ -31,7 +32,7 @@ public class Scheme {
 		tables = s.getTables();
 	}
 	
-	public boolean equals(Scheme s, ExtraEl ee, NotEl ne) {
+	public boolean equals(Scheme s, ExtraEl ee, NotEl ne, PartialEl pe) {
 		int flag = 0;
 		ArrayList<Table> tables2 = s.getTables();
 		if (this.sName.equals(s.getName())) {
@@ -39,7 +40,7 @@ public class Scheme {
 				Table t1 = tables.get(i);
 				for (int j = 0; j < tables2.size(); j++) {
 					Table t2 = tables2.get(j);
-					if (t1.equalsTable(t2, ee, ne)) {
+					if (t1.equalsTable(t2, ee, ne, pe)) {
 						tables2.remove(j);
 						flag++;
 						break;

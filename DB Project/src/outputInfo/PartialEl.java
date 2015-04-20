@@ -24,12 +24,9 @@ public class PartialEl {
 		return true;
 	}
 	
-	public void addReferenceField(Column c) {
-		refCol.add(c);
-	}
-	
-	public void addPartialField(Column c) {
-		partCol.add(c);
+	public void addFields(Column c1, Column c2) {
+		refCol.add(c1);
+		partCol.add(c2);
 	}
 	
 	public ArrayList<Column> getReferenceFields() {

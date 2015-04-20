@@ -7,6 +7,7 @@ import java.util.ArrayList;
 
 import outputInfo.ExtraEl;
 import outputInfo.NotEl;
+import outputInfo.PartialEl;
 
 /**
  * @author Кирилл
@@ -49,17 +50,25 @@ public class Table {
 	 * если нет - заносим в лог и удаляем
 	 */
 	
-	public boolean equalsTable(Table t, ExtraEl ee, NotEl ne) {
+	public boolean equalsTable(Table t, ExtraEl ee, NotEl ne, PartialEl pe) {
 		int flag = 0;
+		int eq = 0;
 		if (this.tName.equals(t.getTableName())) {
 			ArrayList<Column> c = t.getColumns(); 
 			for (int i = 0; i < columns.size(); i++) {
 				for (int j = 0; j < c.size(); j++) {
-					if (columns.get(i).equals(c.get(j))) {
+					eq = columns.get(i).equals(c.get(j));
+					switch (eq) {
+					case 1: 
 						c.remove(j);
 						flag++;
 						break;
-					}
+					case 2: 
+						pe.addFields(columns.get(i), c.get(j));
+						c.remove(j);
+						flag++;
+						break;
+					}				
 				}
 				if (flag == 0) {
 					ne.addColumn(columns.get(i));
