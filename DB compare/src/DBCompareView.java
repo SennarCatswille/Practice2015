@@ -1,4 +1,8 @@
+import java.awt.BorderLayout;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 
 import javax.swing.*;
 import javax.swing.plaf.FontUIResource;
@@ -30,6 +34,8 @@ public class DBCompareView extends JFrame {
 	public DBCompareView() {
 		super("Главная страница");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+		ImageIcon icon = new ImageIcon("image/logo.gif");
+		this.setIconImage(icon.getImage());
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}
@@ -38,7 +44,28 @@ public class DBCompareView extends JFrame {
 		
 		this.setJMenuBar(CreateMainMenu(0));
 		
+		this.add(CreateFirstPanel());
+		
 		this.setVisible(true);		
+	}
+	
+	private JPanel CreateFirstPanel() {
+		JPanel p = new JPanel();
+		JLabel centerIcon = new JLabel();
+		JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
+		
+		centerIcon.setIcon(new ImageIcon("image/logo.png"));
+		nameLabel.setFont(programFont);
+		
+		p.setLayout(new GridBagLayout());
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		
+		p.add(centerIcon, gbc);
+		p.add(nameLabel, gbc);
+		
+		return p;
 	}
 	
 	private JMenuBar CreateMainMenu(int index) {
@@ -66,5 +93,5 @@ public class DBCompareView extends JFrame {
 		
 		return mainMenu;
 	}
-
+	
 }
