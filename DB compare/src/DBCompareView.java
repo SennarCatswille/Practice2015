@@ -21,13 +21,16 @@ public class DBCompareView extends JFrame {
 			new String("Третий пункт"),
 			new String("Выход")
 	};
+	private String[] versions = {
+		new String("0.1"),
+		new String("0.5")
+	};
 	JMenuBar mainMenuBar = new JMenuBar();
 	
 	public DBCompareView() {
-		super("Главная страница");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setIconImage(createIcon("image/miniLogo.png").getImage());
-		this.setMinimumSize(new Dimension(400, 300));
+		this.setMinimumSize(new Dimension(700, 400));
 		this.setSize(500, 350);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
@@ -35,7 +38,7 @@ public class DBCompareView extends JFrame {
 		
 		this.setJMenuBar(CreateMainMenu());
 		
-		this.add(CreateFirstPanel());
+		this.add(CreateComparePanel());
 		
 		this.setVisible(true);		
 	}
@@ -69,11 +72,104 @@ public class DBCompareView extends JFrame {
 	 */
 	private JPanel CreateComparePanel() {
 		BlockMenuItem(1);
-		JPanel p = new JPanel();
-			
+		JPanel mainPanel = new JPanel(); // общая панель
+		JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
+		JPanel rightPanel = new JPanel(); // правая часть с логом действий
+		GridBagConstraints gbc = new GridBagConstraints();
+		Font font = new Font("Colibri", 0, 12);
+		JTextArea logs = new JTextArea();
+		JLabel dbHostLabel = new JLabel("Расположение БД:");
+		JLabel dbNameLabel = new JLabel("Имя базы данных:");
+		JLabel dbUserLabel = new JLabel("Пользователь БД:");
+		JLabel dbPassLabel = new JLabel("Пароль:");
+		JTextField dbHost = new JTextField(15);
+		JTextField dbName = new JTextField(15);
+		JTextField dbUser = new JTextField(15);
+		JPasswordField dbPass = new JPasswordField(15);
+		JButton checkDBButton = new JButton("Проверить");
+		JLabel responseLabel = new JLabel();
+		JLabel versionsLabel = new JLabel("Выберите версию:");
+		JComboBox<String> versionsComboBox = new JComboBox<>(versions);
+		JLabel filePathLabel = new JLabel("Путь к файлу:");
+		JButton filePathButton = new JButton("Выберите файл...");
+		JButton confirmButton = new JButton("Узнать различия");
 		
+		leftPanel.setLayout(new GridBagLayout());
+		gbc.insets = new Insets(3, 0, 3, 3);
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		dbHostLabel.setFont(font);
+		leftPanel.add(dbHostLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 0;
+		leftPanel.add(dbHost, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 1;
+		dbNameLabel.setFont(font);
+		leftPanel.add(dbNameLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 1;
+		leftPanel.add(dbName, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 2;
+		dbUserLabel.setFont(font);
+		leftPanel.add(dbUserLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 2;
+		leftPanel.add(dbUser, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 3;
+		dbPassLabel.setFont(font);
+		leftPanel.add(dbPassLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 3;
+		leftPanel.add(dbPass, gbc);	
 		
-		return p;
+		gbc.gridx = 0;
+		gbc.gridy = 4;
+		checkDBButton.setFont(font);
+		leftPanel.add(checkDBButton, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 4;
+		responseLabel.setFont(font);
+		responseLabel.setVisible(false);
+		leftPanel.add(responseLabel, gbc);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 5;
+		versionsLabel.setFont(font);
+		leftPanel.add(versionsLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 5;
+		versionsComboBox.setFont(font);
+		leftPanel.add(versionsComboBox, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 6;
+		filePathLabel.setFont(font);
+		leftPanel.add(filePathLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 6;
+		filePathButton.setFont(font);
+		leftPanel.add(filePathButton, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 7;
+		confirmButton.setFont(font);
+		leftPanel.add(confirmButton, gbc);
+		
+		logs.setEditable(false);
+        logs.setLineWrap(true);
+        logs.setWrapStyleWord(true);
+        JScrollPane scrollPane = new JScrollPane(logs);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        rightPanel.add(scrollPane, gbc);
+		
+        leftPanel.setMaximumSize(new Dimension(300, 500));
+        
+		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.LINE_AXIS));
+		mainPanel.add(leftPanel);
+		mainPanel.add(rightPanel);		
+		
+		return mainPanel;
 	}
 	/*
 	 * Метод блокировки пункта меню для запрета перехода на текущую форму
@@ -82,7 +178,8 @@ public class DBCompareView extends JFrame {
 		mainMenu.getMenu(0).getItem(index).setEnabled(false);
 		if (this.index != 0) mainMenu.getMenu(0).getItem(this.index).setEnabled(true);
 		mainMenu.updateUI();
-		this.index = 0;
+		this.setTitle(menuParts[index]);
+		this.index = index;
 	}
 	/*
 	 * Метод создания главного меню
