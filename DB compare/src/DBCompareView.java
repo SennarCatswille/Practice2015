@@ -1,11 +1,6 @@
-import java.awt.BorderLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
+import java.awt.*;
 
 import javax.swing.*;
-import javax.swing.plaf.FontUIResource;
 
 /**
  * 
@@ -19,68 +14,88 @@ public class DBCompareView extends JFrame {
 	private int index = 0;
 	private Font programFont = new Font("Colibri", 0, 13);
 	private JMenuBar mainMenu = new JMenuBar();
-	private JMenuItem[] menuParts = {
-			new JMenuItem("Главная страница"),
-			new JMenuItem("Сравнение БД"),
-			new JMenuItem("Еще пункт"),
-			new JMenuItem("Третий пункт"),
-			new JMenuItem("Выход")
+	private String[] menuParts = {
+			new String("Главная страница"),
+			new String("Сравнение БД"),
+			new String("Еще пункт"),
+			new String("Третий пункт"),
+			new String("Выход")
 	};
-	private JPanel dbAuthPanel = new JPanel();
-	private JLabel logo = new JLabel();
-	private JLabel softwareName = new JLabel();
-	
+	JMenuBar mainMenuBar = new JMenuBar();
 	
 	public DBCompareView() {
 		super("Главная страница");
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		ImageIcon icon = new ImageIcon("image/logo.gif");
-		this.setIconImage(icon.getImage());
+		this.setIconImage(createIcon("image/miniLogo.png").getImage());
+		this.setMinimumSize(new Dimension(400, 300));
+		this.setSize(500, 350);
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception e) {}
-
-		this.setSize(500, 300);
+		} catch(Exception e) {}		
 		
-		this.setJMenuBar(CreateMainMenu(0));
+		this.setJMenuBar(CreateMainMenu());
 		
 		this.add(CreateFirstPanel());
 		
 		this.setVisible(true);		
 	}
-	
+	/*
+	 * Метод создания начальной формы
+	 */
 	private JPanel CreateFirstPanel() {
+		BlockMenuItem(0);
+		
 		JPanel p = new JPanel();
 		JLabel centerIcon = new JLabel();
 		JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
 		
-		centerIcon.setIcon(new ImageIcon("image/logo.png"));
-		nameLabel.setFont(programFont);
+		centerIcon.setIcon(createIcon("image/ProgramLogo.png"));
+		Font font = new Font("Colibri", 1, 16);
+		nameLabel.setFont(font);
 		
 		p.setLayout(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.insets = new Insets(15, 1, 1, 1);
 		
 		p.add(centerIcon, gbc);
-		p.add(nameLabel, gbc);
+		p.add(nameLabel, gbc);		
 		
 		return p;
 	}
-	
-	private JMenuBar CreateMainMenu(int index) {
+	/*
+	 * Метод создания формы сравнения баз данных
+	 */
+	private JPanel CreateComparePanel() {
+		BlockMenuItem(1);
+		JPanel p = new JPanel();
+			
+		
+		
+		return p;
+	}
+	/*
+	 * Метод блокировки пункта меню для запрета перехода на текущую форму
+	 */
+	private void BlockMenuItem(int index) {
+		mainMenu.getMenu(0).getItem(index).setEnabled(false);
+		if (this.index != 0) mainMenu.getMenu(0).getItem(this.index).setEnabled(true);
+		mainMenu.updateUI();
+		this.index = 0;
+	}
+	/*
+	 * Метод создания главного меню
+	 */
+	private JMenuBar CreateMainMenu() {
 		JMenu firstMenu = new JMenu("Выберите раздел");
 		firstMenu.setFont(programFont);
 		
-		this.index = index;
 		for (int i = 0; i < menuParts.length; i++) {
 			if (i == menuParts.length - 1) {
 				firstMenu.addSeparator();
 			}
-			if (i != index) {
-				menuParts[i].setFont(programFont);
-				firstMenu.add(menuParts[i]);
-			}
+			firstMenu.add(new JMenuItem(menuParts[i]));
 		}
 		
 		mainMenu.add(firstMenu);
@@ -93,5 +108,16 @@ public class DBCompareView extends JFrame {
 		
 		return mainMenu;
 	}
-	
+	/*
+	 * Метод создания иконки из картинки по переданному пути
+	 */
+	private ImageIcon createIcon(String path) {
+        java.net.URL imgURL = Main.class.getResource(path);    
+        if (imgURL != null) {
+            return new ImageIcon(imgURL);
+        } else {
+            System.err.println("Файл не найден " + path);
+            return null;
+        }
+    }
 }
