@@ -1,4 +1,5 @@
 import java.awt.*;
+import java.awt.event.ActionListener;
 
 import javax.swing.*;
 
@@ -12,20 +13,42 @@ import javax.swing.*;
  */
 public class DBCompareView extends JFrame {
 	private int index = 0;
-	private Font programFont = new Font("Colibri", 0, 13);
 	private JMenuBar mainMenu = new JMenuBar();
-	private String[] menuParts = {
-			new String("Главная страница"),
-			new String("Сравнение БД"),
-			new String("Еще пункт"),
-			new String("Третий пункт"),
-			new String("Выход")
-	};
 	private String[] versions = {
 		new String("0.1"),
 		new String("0.5")
 	};
-	JMenuBar mainMenuBar = new JMenuBar();
+	JMenu firstMenu = new JMenu("Выберите раздел");
+	JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
+	JMenuItem compareDBMenuItem = new JMenuItem("Сравнение БД");
+	JMenuItem testMenuItem = new JMenuItem("Третий пункт");
+	JMenuItem exitNemuItem = new JMenuItem("Выход");
+	JMenu settings = new JMenu("Настройки");	
+	
+	JPanel p = new JPanel();
+	JLabel centerIcon = new JLabel();
+	JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
+	
+	JPanel mainPanel = new JPanel(); // общая панель
+	JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
+	JPanel rightPanel = new JPanel(); // правая часть с логом действий	
+	Font font = new Font("Colibri", 0, 12);
+	JTextArea logs = new JTextArea();
+	JLabel dbHostLabel = new JLabel("Расположение БД:");
+	JLabel dbNameLabel = new JLabel("Имя базы данных:");
+	JLabel dbUserLabel = new JLabel("Пользователь БД:");
+	JLabel dbPassLabel = new JLabel("Пароль:");
+	JTextField dbHost = new JTextField(15);
+	JTextField dbName = new JTextField(15);
+	JTextField dbUser = new JTextField(15);
+	JPasswordField dbPass = new JPasswordField(15);
+	JButton checkDBButton = new JButton("Проверить");
+	JLabel responseLabel = new JLabel();
+	JLabel versionsLabel = new JLabel("Выберите версию:");
+	JComboBox<String> versionsComboBox = new JComboBox<>(versions);
+	JLabel filePathLabel = new JLabel("Путь к файлу:");
+	JButton filePathButton = new JButton("Выберите файл...");
+	JButton confirmButton = new JButton("Узнать различия");
 	
 	public DBCompareView() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -38,7 +61,7 @@ public class DBCompareView extends JFrame {
 		
 		this.setJMenuBar(CreateMainMenu());
 		
-		this.add(CreateComparePanel());
+		this.add(CreateFirstPanel());
 		
 		this.setVisible(true);		
 	}
@@ -47,10 +70,6 @@ public class DBCompareView extends JFrame {
 	 */
 	private JPanel CreateFirstPanel() {
 		BlockMenuItem(0);
-		
-		JPanel p = new JPanel();
-		JLabel centerIcon = new JLabel();
-		JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
 		
 		centerIcon.setIcon(createIcon("image/ProgramLogo.png"));
 		Font font = new Font("Colibri", 1, 16);
@@ -72,27 +91,7 @@ public class DBCompareView extends JFrame {
 	 */
 	private JPanel CreateComparePanel() {
 		BlockMenuItem(1);
-		JPanel mainPanel = new JPanel(); // общая панель
-		JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
-		JPanel rightPanel = new JPanel(); // правая часть с логом действий
 		GridBagConstraints gbc = new GridBagConstraints();
-		Font font = new Font("Colibri", 0, 12);
-		JTextArea logs = new JTextArea();
-		JLabel dbHostLabel = new JLabel("Расположение БД:");
-		JLabel dbNameLabel = new JLabel("Имя базы данных:");
-		JLabel dbUserLabel = new JLabel("Пользователь БД:");
-		JLabel dbPassLabel = new JLabel("Пароль:");
-		JTextField dbHost = new JTextField(15);
-		JTextField dbName = new JTextField(15);
-		JTextField dbUser = new JTextField(15);
-		JPasswordField dbPass = new JPasswordField(15);
-		JButton checkDBButton = new JButton("Проверить");
-		JLabel responseLabel = new JLabel();
-		JLabel versionsLabel = new JLabel("Выберите версию:");
-		JComboBox<String> versionsComboBox = new JComboBox<>(versions);
-		JLabel filePathLabel = new JLabel("Путь к файлу:");
-		JButton filePathButton = new JButton("Выберите файл...");
-		JButton confirmButton = new JButton("Узнать различия");
 		
 		leftPanel.setLayout(new GridBagLayout());
 		gbc.insets = new Insets(3, 0, 3, 3);
@@ -178,26 +177,28 @@ public class DBCompareView extends JFrame {
 		mainMenu.getMenu(0).getItem(index).setEnabled(false);
 		if (this.index != 0) mainMenu.getMenu(0).getItem(this.index).setEnabled(true);
 		mainMenu.updateUI();
-		this.setTitle(menuParts[index]);
+		this.setTitle(mainMenu.getMenu(0).getItem(index).getText());
 		this.index = index;
 	}
 	/*
 	 * Метод создания главного меню
 	 */
 	private JMenuBar CreateMainMenu() {
-		JMenu firstMenu = new JMenu("Выберите раздел");
+		Font programFont = new Font("Colibri", 0, 12);
 		firstMenu.setFont(programFont);
 		
-		for (int i = 0; i < menuParts.length; i++) {
-			if (i == menuParts.length - 1) {
-				firstMenu.addSeparator();
-			}
-			firstMenu.add(new JMenuItem(menuParts[i]));
-		}
+		mainPageMenuItem.setFont(programFont);
+		firstMenu.add(mainPageMenuItem);
+		compareDBMenuItem.setFont(programFont);
+		firstMenu.add(compareDBMenuItem);
+		testMenuItem.setFont(programFont);
+		firstMenu.add(testMenuItem);
+		firstMenu.addSeparator();
+		exitNemuItem.setFont(programFont);
+		firstMenu.add(exitNemuItem);
 		
 		mainMenu.add(firstMenu);
 		
-		JMenu settings = new JMenu("Настройки");	
 		settings.setFont(programFont);
 		mainMenu.add(settings);
 		
@@ -217,4 +218,57 @@ public class DBCompareView extends JFrame {
             return null;
         }
     }
+	/*
+	 * Методы добавление слушателей событий к кнопкам
+	 */
+	public void AddConfirmButtonActionListener (ActionListener al) {
+		confirmButton.addActionListener(al);
+	}
+	
+	public void AddFilepathButtonActionListener (ActionListener al) {
+		filePathButton.addActionListener(al);
+	}
+	
+	public void AddCheckDBButtonActionListener (ActionListener al) {
+		checkDBButton.addActionListener(al);
+	}
+	
+	public void AddMainPageMenuItemActionListener (ActionListener al) {
+		mainPageMenuItem.addActionListener(al);
+	}
+	
+	public void AddCompareDBMenuItemActionListener (ActionListener al) {
+		compareDBMenuItem.addActionListener(al);
+	}
+	
+	public void AddExitNemuItemActionListener (ActionListener al) {
+		exitNemuItem.addActionListener(al);
+	}
+	/*
+	 * Методы получения информации из полей ввода
+	 */
+	public String getDBHost () {
+		return dbHost.getText();
+	}
+	
+	public String getDBName () {
+		return dbName.getText();
+	}
+	
+	public String getDBUser () {
+		return dbUser.getText();
+	}
+	
+	public String getDBPass () {
+		char[] pass = dbPass.getPassword(); 
+		return pass.toString();
+	}
+	/*
+	 * Методы установки значений визуальным компонентам
+	 */
+	public void SetFilePathOnButton (String fp) {
+		filePathButton.setText(fp);
+		filePathButton.updateUI();
+	}
+	
 }
