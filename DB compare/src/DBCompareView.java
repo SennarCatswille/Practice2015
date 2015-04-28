@@ -12,43 +12,49 @@ import javax.swing.*;
  *
  */
 public class DBCompareView extends JFrame {
-	private int index = 0;
+	private int index = -1;
 	private JMenuBar mainMenu = new JMenuBar();
 	private String[] versions = {
 		new String("0.1"),
 		new String("0.5")
 	};
-	JMenu firstMenu = new JMenu("Выберите раздел");
-	JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
-	JMenuItem compareDBMenuItem = new JMenuItem("Сравнение БД");
-	JMenuItem testMenuItem = new JMenuItem("Третий пункт");
-	JMenuItem exitNemuItem = new JMenuItem("Выход");
-	JMenu settings = new JMenu("Настройки");	
 	
-	JPanel p = new JPanel();
-	JLabel centerIcon = new JLabel();
-	JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
+	private JMenu firstMenu = new JMenu("Выберите раздел");
+	private JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
+	private JMenuItem compareDBMenuItem = new JMenuItem("Сравнение БД");
+	private JMenuItem testMenuItem = new JMenuItem("Третий пункт");
+	private JMenuItem exitNemuItem = new JMenuItem("Выход");
+	private JMenu settings = new JMenu("Настройки");	
 	
-	JPanel mainPanel = new JPanel(); // общая панель
-	JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
-	JPanel rightPanel = new JPanel(); // правая часть с логом действий	
-	Font font = new Font("Colibri", 0, 12);
-	JTextArea logs = new JTextArea();
-	JLabel dbHostLabel = new JLabel("Расположение БД:");
-	JLabel dbNameLabel = new JLabel("Имя базы данных:");
-	JLabel dbUserLabel = new JLabel("Пользователь БД:");
-	JLabel dbPassLabel = new JLabel("Пароль:");
-	JTextField dbHost = new JTextField(15);
-	JTextField dbName = new JTextField(15);
-	JTextField dbUser = new JTextField(15);
-	JPasswordField dbPass = new JPasswordField(15);
-	JButton checkDBButton = new JButton("Проверить");
-	JLabel responseLabel = new JLabel();
-	JLabel versionsLabel = new JLabel("Выберите версию:");
-	JComboBox<String> versionsComboBox = new JComboBox<>(versions);
-	JLabel filePathLabel = new JLabel("Путь к файлу:");
-	JButton filePathButton = new JButton("Выберите файл...");
-	JButton confirmButton = new JButton("Узнать различия");
+	private JPanel firstPanel = new JPanel();
+	private JLabel centerIcon = new JLabel();
+	private JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
+	
+	private JPanel mainPanel = new JPanel(); // общая панель
+	private JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
+	private JPanel rightPanel = new JPanel(); // правая часть с логом действий	
+	private Font font = new Font("Colibri", 0, 12);
+	private JTextArea logs = new JTextArea();
+	private JLabel dbHostLabel = new JLabel("Расположение БД:");
+	private JLabel dbNameLabel = new JLabel("Имя базы данных:");
+	private JLabel dbUserLabel = new JLabel("Пользователь БД:");
+	private JLabel dbPassLabel = new JLabel("Пароль:");
+	private JTextField dbHost = new JTextField(15);
+	private JTextField dbName = new JTextField(15);
+	private JTextField dbUser = new JTextField(15);
+	private JPasswordField dbPass = new JPasswordField(15);
+	private JButton checkDBButton = new JButton("Проверить");
+	private JLabel responseLabel = new JLabel();
+	private JLabel versionsLabel = new JLabel("Выберите версию:");
+	private JComboBox<String> versionsComboBox = new JComboBox<>(versions);
+	private JLabel filePathLabel = new JLabel("Путь к файлу:");
+	private JButton filePathButton = new JButton("Выберите файл...");
+	private JButton confirmButton = new JButton("Узнать различия");
+	
+	private JPanel[] programForms = {
+			firstPanel,
+			mainPanel
+	};
 	
 	public DBCompareView() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -61,35 +67,47 @@ public class DBCompareView extends JFrame {
 		
 		this.setJMenuBar(CreateMainMenu());
 		
-		this.add(CreateFirstPanel());
+		CreateFirstPanel();
+		CreateComparePanel();
 		
-		this.setVisible(true);		
+		//this.add(firstPanel);
+		//this.add(mainPanel);
+		
+		ChangeForm(0);
 	}
+	
+	public void ChangeForm(int index) {
+		if (this.index != -1) this.remove(programForms[this.index]);
+		this.add(programForms[index]);
+		this.invalidate();
+		this.validate();
+		BlockMenuItem(index); 
+		this.dispose();
+	}	
 	/*
 	 * Метод создания начальной формы
 	 */
-	private JPanel CreateFirstPanel() {
+	private void CreateFirstPanel() {
 		BlockMenuItem(0);
 		
 		centerIcon.setIcon(createIcon("image/ProgramLogo.png"));
 		Font font = new Font("Colibri", 1, 16);
 		nameLabel.setFont(font);
 		
-		p.setLayout(new GridBagLayout());
+		firstPanel.setLayout(new GridBagLayout());
 		
 		GridBagConstraints gbc = new GridBagConstraints();
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		gbc.insets = new Insets(15, 1, 1, 1);
 		
-		p.add(centerIcon, gbc);
-		p.add(nameLabel, gbc);		
+		firstPanel.add(centerIcon, gbc);
+		firstPanel.add(nameLabel, gbc);		
 		
-		return p;
 	}
 	/*
 	 * Метод создания формы сравнения баз данных
 	 */
-	private JPanel CreateComparePanel() {
+	private void CreateComparePanel() {
 		BlockMenuItem(1);
 		GridBagConstraints gbc = new GridBagConstraints();
 		
@@ -167,15 +185,13 @@ public class DBCompareView extends JFrame {
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.LINE_AXIS));
 		mainPanel.add(leftPanel);
 		mainPanel.add(rightPanel);		
-		
-		return mainPanel;
-	}
+	}	
 	/*
 	 * Метод блокировки пункта меню для запрета перехода на текущую форму
 	 */
 	private void BlockMenuItem(int index) {
 		mainMenu.getMenu(0).getItem(index).setEnabled(false);
-		if (this.index != 0) mainMenu.getMenu(0).getItem(this.index).setEnabled(true);
+		if (this.index != -1) mainMenu.getMenu(0).getItem(this.index).setEnabled(true);
 		mainMenu.updateUI();
 		this.setTitle(mainMenu.getMenu(0).getItem(index).getText());
 		this.index = index;
@@ -241,7 +257,7 @@ public class DBCompareView extends JFrame {
 		compareDBMenuItem.addActionListener(al);
 	}
 	
-	public void AddExitNemuItemActionListener (ActionListener al) {
+	public void AddExitMenuItemActionListener (ActionListener al) {
 		exitNemuItem.addActionListener(al);
 	}
 	/*
