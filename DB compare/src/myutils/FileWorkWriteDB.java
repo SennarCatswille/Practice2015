@@ -17,21 +17,21 @@ import objDB.Table;
  */
 public class FileWorkWriteDB {
 	private DataBase db = null;
-	private Logs l;
+	//private Logs l;
 	
 	/*
 	 * Конструктор класса
 	 */
-	public FileWorkWriteDB(DataBase temp, Logs log) {
+	public FileWorkWriteDB(DataBase temp) {
 		db = temp;
-		l = log;
+		//l = log;
 	}
 	
 	public StringBuilder CreateFileDB() {
 		StringBuilder outStr = new StringBuilder();
 		ArrayList<Scheme> scheme = db.getSchemes();
 		ArrayList<Table> table = new ArrayList<>();
-		l.addMsg("Начинаю вывод в файл");
+		//l.addMsg("Начинаю вывод в файл");
 		for (Scheme s : scheme) {
 			outStr.append(s.getName());
 			table = s.getTables();
@@ -42,7 +42,7 @@ public class FileWorkWriteDB {
 			}
 			outStr.append(" | ");
 		}
-		l.addMsg("Вывод окончен");
+		//l.addMsg("Вывод окончен");
 		return outStr;
 	}
 	

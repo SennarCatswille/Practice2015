@@ -49,9 +49,9 @@ public class DBCompareView extends JFrame {
 	private JLabel responseLabel = new JLabel();
 	private JLabel versionsLabel = new JLabel("Выберите версию:");
 	private JComboBox<String> versionsComboBox = new JComboBox<>(versions);
-	private JLabel filePathLabel = new JLabel("Путь к файлу:");
-	private JButton filePathButton = new JButton("Выберите файл...");
-	private JButton confirmButton = new JButton("Узнать различия");
+	private JLabel dirPathLabel = new JLabel("Путь директории:");
+	private JButton dirPathButton = new JButton("Выберите директорию...");
+	private JButton confirmButton = new JButton("Создать мета-описание");
 	
 	private JPanel[] programForms = {
 			firstPanel,
@@ -121,6 +121,7 @@ public class DBCompareView extends JFrame {
 		leftPanel.add(dbHostLabel, gbc);
 		gbc.gridx = 1;
 		gbc.gridy = 0;
+		dbHost.setText("localhost:50000");
 		leftPanel.add(dbHost, gbc);
 		gbc.gridx = 0;
 		gbc.gridy = 1;
@@ -164,14 +165,16 @@ public class DBCompareView extends JFrame {
 		leftPanel.add(versionsComboBox, gbc);*/
 		gbc.gridx = 0;
 		gbc.gridy = 6;
-		filePathLabel.setFont(font);
-		leftPanel.add(filePathLabel, gbc);
+		dirPathLabel.setFont(font);
+		leftPanel.add(dirPathLabel, gbc);
 		gbc.gridx = 1;
 		gbc.gridy = 6;
-		filePathButton.setFont(font);
-		leftPanel.add(filePathButton, gbc);
+		dirPathButton.setFont(font);
+		leftPanel.add(dirPathButton, gbc);
 		gbc.gridx = 0;
 		gbc.gridy = 7;
+		gbc.insets = new Insets(10, 10, 3, 3);
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		confirmButton.setFont(font);
 		leftPanel.add(confirmButton, gbc);
 		
@@ -180,9 +183,10 @@ public class DBCompareView extends JFrame {
 		logs.setEditable(false);
         logs.setLineWrap(true);
         logs.setWrapStyleWord(true);
-        logs.setPreferredSize(new Dimension(340, 300));
+        logs.setPreferredSize(new Dimension(330, 300));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
+        gbc.insets = new Insets(3, 3, 3, 3);
         gbc.gridx = 0;
         gbc.gridy = 0;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
@@ -254,8 +258,8 @@ public class DBCompareView extends JFrame {
 		confirmButton.addActionListener(al);
 	}
 	
-	public void AddFilepathButtonActionListener (ActionListener al) {
-		filePathButton.addActionListener(al);
+	public void AddDirpathButtonActionListener (ActionListener al) {
+		dirPathButton.addActionListener(al);
 	}
 	
 	public void AddCheckDBButtonActionListener (ActionListener al) {
@@ -293,15 +297,38 @@ public class DBCompareView extends JFrame {
 	}
 	
 	public String getDBPass () {
-		char[] pass = dbPass.getPassword(); 
-		return pass.toString();
+		String pass = new String(dbPass.getPassword()); 
+		return pass;
 	}
 	/*
 	 * Методы установки значений визуальным компонентам
 	 */
-	public void SetFilePathOnButton (String fp) {
-		filePathButton.setText(fp);
-		filePathButton.updateUI();
+	public void SetDirPathOnButton (Object button, String dp) {
+		if(button instanceof JButton){
+            if (!dp.isEmpty()) {
+            	int t = 0;
+    			int k = 0;
+    			while (t != -1) {
+    				k = t;
+    				t = dp.indexOf("\\", t+1);
+    			}
+    			Dimension dim = ((JButton)button).getPreferredSize();
+    			((JButton)button).setText(dp.substring(k));
+    			((JButton)button).setPreferredSize(dim);
+    			((JButton)button).updateUI();
+            }
+         }
 	}
 	
+	public void SetGoodConnection() {
+		responseLabel.setText(" Успешно!");
+		responseLabel.setIcon(createIcon("image/good.png"));
+		responseLabel.setVisible(true);
+	}
+	
+	public void SetBadConnection() {
+		responseLabel.setText(" Неудача!");
+		responseLabel.setIcon(createIcon("image/bad.png"));
+		responseLabel.setVisible(true);
+	}
 }

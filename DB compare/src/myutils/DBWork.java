@@ -24,16 +24,16 @@ public class DBWork {
 	private DataBase db = null; //- объект базы данных
 	private Connection con = null; //- подключение к базе данных
 	private DatabaseMetaData dbmeta = null; //- мета-данные о БД
-	private Logs l; //- объект логов программы
+	//private Logs l; //- объект логов программы
 	private boolean state = false; //- определяет состояние подключения к базе данных
 	private String[] conDB = new String[4]; //- массив данных о подключении к бд
 	
 	/*
 	 * Конструктор класса, передаем в него объект логов программы
-	 */
+	 
 	public DBWork(Logs log) {
 		l = log;
-	}
+	}*/
 	/*
 	 * Основной метод - создание объекта базы данных
 	 * Принимает массив со следующей структурой:
@@ -53,13 +53,13 @@ public class DBWork {
 		ConnectionToDB();
 		if (state) {
 			//- Если подключение установлено успешно, начинаем преобразование базы данных
-			l.addMsg("Начинаю анализ базы данных!");
+			//l.addMsg("Начинаю анализ базы данных!");
 			try {
 				dbmeta = con.getMetaData();
 				ArrayList<String> schem = Schemes();
 				int i = 1;
 				for (String s : schem) {
-					l.addMsg("Схема " + i + "/" + schem.size() + " [" + s + "]");
+					//l.addMsg("Схема " + i + "/" + schem.size() + " [" + s + "]");
 					ArrayList<String> tab = Tables(s);
 					table = new ArrayList<>();
 					for (String t : tab) {
@@ -77,7 +77,7 @@ public class DBWork {
 			}
 			
 		}		
-		l.addMsg("Анализ окончен!");
+		//l.addMsg("Анализ окончен!");
 		return db;
 	}
 	/*
@@ -150,49 +150,28 @@ public class DBWork {
 	 * Подключение к БД
 	 */
 	private void ConnectionToDB() {
-		l.addMsg("Устанавливаю связь с базой данных!");
+		//l.addMsg("Устанавливаю связь с базой данных!");
 		boolean isDriverRegistred = false;
 		try {
 			Class.forName("com.ibm.db2.jcc.DB2Driver");	
-	        l.addMsg("Драйвер DB2 загружен успешно!");
+	       // l.addMsg("Драйвер DB2 загружен успешно!");
 	        isDriverRegistred = true;
 		} catch (ClassNotFoundException e) {
-			l.addMsg("Ошибка загрузки драйвера DB2!");
-			l.addMsg(e.getMessage().toString());
+			//l.addMsg("Ошибка загрузки драйвера DB2!");
+			//l.addMsg(e.getMessage().toString());
 		}
 		if (isDriverRegistred) {
 			try {
 				String strcon = "jdbc:db2://" + conDB[0] + "/" + conDB[1];
 				con = DriverManager.getConnection(strcon, conDB[2], conDB[3]);				
-				l.addMsg("Подключение к БД установлено успешно!");
+				//l.addMsg("Подключение к БД установлено успешно!");
 				dbmeta = con.getMetaData();
 				state = true;
 			} catch (SQLException e) {
-				l.addMsg("Не удалось подключиться к БД!");
-				l.addMsg(e.getMessage().toString());
+				//l.addMsg("Не удалось подключиться к БД!");
+				//l.addMsg(e.getMessage().toString());
 			}
 		}		
-	}
-	/*
-	 * Метод тестирования подключения к базе данных.
-	 * Принимает массив строк со структурой:
-	 * [0] - хост
-	 * [1] - имя базы данных
-	 * [2] - пользователь
-	 * [3] - пароль
-	 */
-	public static boolean TestDB(String[] dbInfo) {
-		try {
-			Class.forName("com.ibm.db2.jcc.DB2Driver");	
-			String strcon = "jdbc:db2://" + dbInfo[0] + "/" + dbInfo[1];
-			Connection con = DriverManager.getConnection(strcon, dbInfo[2], dbInfo[3]);
-			con.close();
-			return true;
-		} catch (ClassNotFoundException e) {
-			return false;
-		} catch (SQLException e) {
-			return false;
-		}
 	}
 	/*
 	 * Метод получения состояния подключения к базе данных
@@ -209,8 +188,8 @@ public class DBWork {
 				con.commit();
 				con.close();
 			} catch (Exception e) {
-				l.addMsg("Проблема с закрытием подключения к DB2:");
-				l.addMsg(e.getStackTrace().toString());
+				//l.addMsg("Проблема с закрытием подключения к DB2:");
+				//l.addMsg(e.getStackTrace().toString());
 			}
 			con = null;
 		}
