@@ -16,6 +16,9 @@ public class DBCompareController {
 		this.theModel = theModel;
 		
 		this.theView.AddExitMenuItemActionListener(new ExitMenuItemActionListener());
+		this.theView.AddMainPageMenuItemActionListener(new SwitchToMainPageActionListener());
+		this.theView.AddCompareDBMenuItemActionListener(new SwitchToCompareDBPageActionListener());
+		
 	}
 	
 	class ExitMenuItemActionListener implements ActionListener {
@@ -23,5 +26,19 @@ public class DBCompareController {
 		public void actionPerformed(ActionEvent e) {
 			theView.dispose();			
 		}
+	}
+	
+	class SwitchToMainPageActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			theView.ChangeForm(0);
+		}
+	}
+	
+	class SwitchToCompareDBPageActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			theView.ChangeForm(1);
+		}		
 	}
 }

@@ -24,7 +24,7 @@ public class DBCompareView extends JFrame {
 	private JMenuItem compareDBMenuItem = new JMenuItem("Сравнение БД");
 	private JMenuItem testMenuItem = new JMenuItem("Третий пункт");
 	private JMenuItem exitNemuItem = new JMenuItem("Выход");
-	private JMenu settings = new JMenu("Настройки");	
+	private JMenu settingsMenu = new JMenu("Настройки");	
 	
 	private JPanel firstPanel = new JPanel();
 	private JLabel centerIcon = new JLabel();
@@ -34,7 +34,9 @@ public class DBCompareView extends JFrame {
 	private JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
 	private JPanel rightPanel = new JPanel(); // правая часть с логом действий	
 	private Font font = new Font("Colibri", 0, 12);
+	private JLabel logsLabel = new JLabel("Действия программы:");
 	private JTextArea logs = new JTextArea();
+	private JScrollPane scrollPane = new JScrollPane(logs);
 	private JLabel dbHostLabel = new JLabel("Расположение БД:");
 	private JLabel dbNameLabel = new JLabel("Имя базы данных:");
 	private JLabel dbUserLabel = new JLabel("Пользователь БД:");
@@ -81,8 +83,8 @@ public class DBCompareView extends JFrame {
 		this.add(programForms[index]);
 		this.invalidate();
 		this.validate();
+		programForms[index].updateUI();
 		BlockMenuItem(index); 
-		this.dispose();
 	}	
 	/*
 	 * Метод создания начальной формы
@@ -112,7 +114,7 @@ public class DBCompareView extends JFrame {
 		GridBagConstraints gbc = new GridBagConstraints();
 		
 		leftPanel.setLayout(new GridBagLayout());
-		gbc.insets = new Insets(3, 0, 3, 3);
+		gbc.insets = new Insets(3, 3, 3, 3);
 		gbc.gridx = 0;
 		gbc.gridy = 0;
 		dbHostLabel.setFont(font);
@@ -151,7 +153,7 @@ public class DBCompareView extends JFrame {
 		responseLabel.setFont(font);
 		responseLabel.setVisible(false);
 		leftPanel.add(responseLabel, gbc);
-		
+		/*
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		versionsLabel.setFont(font);
@@ -159,7 +161,7 @@ public class DBCompareView extends JFrame {
 		gbc.gridx = 1;
 		gbc.gridy = 5;
 		versionsComboBox.setFont(font);
-		leftPanel.add(versionsComboBox, gbc);
+		leftPanel.add(versionsComboBox, gbc);*/
 		gbc.gridx = 0;
 		gbc.gridy = 6;
 		filePathLabel.setFont(font);
@@ -173,18 +175,29 @@ public class DBCompareView extends JFrame {
 		confirmButton.setFont(font);
 		leftPanel.add(confirmButton, gbc);
 		
+		rightPanel.setLayout(new GridBagLayout());
+		logsLabel.setFont(font);
 		logs.setEditable(false);
         logs.setLineWrap(true);
         logs.setWrapStyleWord(true);
-        JScrollPane scrollPane = new JScrollPane(logs);
+        logs.setPreferredSize(new Dimension(340, 300));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        //gbc.anchor = GridBagConstraints.NORTHWEST;
+        rightPanel.add(logsLabel, gbc);
+        gbc.gridy = 1;
+        gbc.gridheight = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.BOTH;
         rightPanel.add(scrollPane, gbc);
 		
         leftPanel.setMaximumSize(new Dimension(300, 500));
         
 		mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.LINE_AXIS));
 		mainPanel.add(leftPanel);
-		mainPanel.add(rightPanel);		
+		mainPanel.add(rightPanel);
 	}	
 	/*
 	 * Метод блокировки пункта меню для запрета перехода на текущую форму
@@ -215,8 +228,8 @@ public class DBCompareView extends JFrame {
 		
 		mainMenu.add(firstMenu);
 		
-		settings.setFont(programFont);
-		mainMenu.add(settings);
+		settingsMenu.setFont(programFont);
+		mainMenu.add(settingsMenu);
 		
 		mainMenu.setFont(programFont);
 		
@@ -259,6 +272,10 @@ public class DBCompareView extends JFrame {
 	
 	public void AddExitMenuItemActionListener (ActionListener al) {
 		exitNemuItem.addActionListener(al);
+	}
+	
+	public void SettingsMenuActionListener (ActionListener al) {
+		settingsMenu.addActionListener(al);
 	}
 	/*
 	 * Методы получения информации из полей ввода
