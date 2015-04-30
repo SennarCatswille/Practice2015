@@ -3,6 +3,8 @@
  */
 package myutils;
 
+import MVC.DBCompareController;
+
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -53,13 +55,12 @@ public class DBWork {
 		ConnectionToDB();
 		if (state) {
 			//- Если подключение установлено успешно, начинаем преобразование базы данных
-			//l.addMsg("Начинаю анализ базы данных!");
 			try {
 				dbmeta = con.getMetaData();
 				ArrayList<String> schem = Schemes();
 				int i = 1;
 				for (String s : schem) {
-					//l.addMsg("Схема " + i + "/" + schem.size() + " [" + s + "]");
+					DBCompareController.AddLogMessage("Схема " + i + "/" + schem.size() + " [" + s + "]");
 					ArrayList<String> tab = Tables(s);
 					table = new ArrayList<>();
 					for (String t : tab) {
@@ -77,7 +78,7 @@ public class DBWork {
 			}
 			
 		}		
-		//l.addMsg("Анализ окончен!");
+		DBCompareController.AddLogMessage("Анализ окончен!");
 		return db;
 	}
 	/*
@@ -150,26 +151,26 @@ public class DBWork {
 	 * Подключение к БД
 	 */
 	private void ConnectionToDB() {
-		//l.addMsg("Устанавливаю связь с базой данных!");
+		DBCompareController.AddLogMessage("Устанавливаю связь с базой данных!");
 		boolean isDriverRegistred = false;
 		try {
 			Class.forName("com.ibm.db2.jcc.DB2Driver");	
-	       // l.addMsg("Драйвер DB2 загружен успешно!");
+			DBCompareController.AddLogMessage("Драйвер DB2 загружен успешно!");
 	        isDriverRegistred = true;
 		} catch (ClassNotFoundException e) {
-			//l.addMsg("Ошибка загрузки драйвера DB2!");
-			//l.addMsg(e.getMessage().toString());
+			DBCompareController.AddLogMessage("Ошибка загрузки драйвера DB2!");
+			DBCompareController.AddLogMessage(e.getMessage().toString());
 		}
 		if (isDriverRegistred) {
 			try {
 				String strcon = "jdbc:db2://" + conDB[0] + "/" + conDB[1];
 				con = DriverManager.getConnection(strcon, conDB[2], conDB[3]);				
-				//l.addMsg("Подключение к БД установлено успешно!");
+				DBCompareController.AddLogMessage("Подключение к БД установлено успешно!");
 				dbmeta = con.getMetaData();
 				state = true;
 			} catch (SQLException e) {
-				//l.addMsg("Не удалось подключиться к БД!");
-				//l.addMsg(e.getMessage().toString());
+				DBCompareController.AddLogMessage("Не удалось подключиться к БД!");
+				DBCompareController.AddLogMessage(e.getMessage().toString());
 			}
 		}		
 	}
@@ -188,8 +189,8 @@ public class DBWork {
 				con.commit();
 				con.close();
 			} catch (Exception e) {
-				//l.addMsg("Проблема с закрытием подключения к DB2:");
-				//l.addMsg(e.getStackTrace().toString());
+				DBCompareController.AddLogMessage("Проблема с закрытием подключения к DB2:");
+				DBCompareController.AddLogMessage(e.getStackTrace().toString());
 			}
 			con = null;
 		}

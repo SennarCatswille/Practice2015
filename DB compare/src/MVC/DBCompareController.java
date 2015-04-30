@@ -1,3 +1,4 @@
+package MVC;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -9,7 +10,7 @@ import javax.swing.*;
  *
  */
 public class DBCompareController {
-	private DBCompareView theView;
+	private static DBCompareView theView;
 	private DBCompareModel theModel;
 	
 	public DBCompareController(DBCompareView theView, DBCompareModel theModel) {
@@ -48,12 +49,14 @@ public class DBCompareController {
 	class CheckDBButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			AddLogMessage("Начинаю проверку подключения...");
 			String dbHost = theView.getDBHost();
 			String dbName = theView.getDBName();
 			String dbUser = theView.getDBUser();
 			String dbPass = theView.getDBPass();
 			if (theModel.CheckDBConnection(dbHost, dbName, dbUser, dbPass)) {
 				theView.SetGoodConnection();
+				AddLogMessage("Проверка подключения пройдена успешно!");
 			} else {
 				theView.SetBadConnection();
 			}
@@ -73,6 +76,8 @@ public class DBCompareController {
                 theModel.setDirPath(dirpath);
                 Object button = e.getSource();
                 theView.SetDirPathOnButton(button, dirpath);
+                AddLogMessage("Выбрана директория для вывода: ");
+                AddLogMessage("  " + dirpath);
             }			
 		}
 	}
@@ -80,6 +85,7 @@ public class DBCompareController {
 	class ConfirmButtonActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
+			AddLogMessage("Начинаю создание файла мета-описания базы данных...");
 			String dbHost = theView.getDBHost();
 			String dbName = theView.getDBName();
 			String dbUser = theView.getDBUser();
@@ -88,5 +94,9 @@ public class DBCompareController {
 			String[] dbInfo = theModel.checkDB(dbHost, dbName, dbUser, dbPass);
 			theModel.CreateDBMetaFile(dbInfo);
 		}
+	}
+	
+	public static void AddLogMessage(String str) {
+		theView.AddToLog(str);
 	}
 }

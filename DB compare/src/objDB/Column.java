@@ -16,6 +16,7 @@ public class Column {
 	public Column(String c, String t, int s, String st) {
 		colName = new String(c);
 		typeName = new String(t);
+		typeName.replace(' ', '_');
 		schemeTable = st;
 		size = s;		
 	}

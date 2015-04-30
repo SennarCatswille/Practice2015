@@ -1,3 +1,4 @@
+package MVC;
 import java.awt.*;
 import java.awt.event.ActionListener;
 
@@ -21,8 +22,8 @@ public class DBCompareView extends JFrame {
 	
 	private JMenu firstMenu = new JMenu("Выберите раздел");
 	private JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
-	private JMenuItem compareDBMenuItem = new JMenuItem("Сравнение БД");
-	private JMenuItem testMenuItem = new JMenuItem("Третий пункт");
+	private JMenuItem compareDBMenuItem = new JMenuItem("Создание файла мета-данных");
+	private JMenuItem testMenuItem = new JMenuItem("Тестовый пункт (не работает)");
 	private JMenuItem exitNemuItem = new JMenuItem("Выход");
 	private JMenu settingsMenu = new JMenu("Настройки");	
 	
@@ -60,7 +61,7 @@ public class DBCompareView extends JFrame {
 	
 	public DBCompareView() {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setIconImage(createIcon("image/miniLogo.png").getImage());
+		this.setIconImage(createIcon("../image/miniLogo.png").getImage());
 		this.setMinimumSize(new Dimension(700, 400));
 		this.setSize(500, 350);
 		try {
@@ -92,7 +93,7 @@ public class DBCompareView extends JFrame {
 	private void CreateFirstPanel() {
 		BlockMenuItem(0);
 		
-		centerIcon.setIcon(createIcon("image/ProgramLogo.png"));
+		centerIcon.setIcon(createIcon("../image/ProgramLogo.png"));
 		Font font = new Font("Colibri", 1, 16);
 		nameLabel.setFont(font);
 		
@@ -322,13 +323,19 @@ public class DBCompareView extends JFrame {
 	
 	public void SetGoodConnection() {
 		responseLabel.setText(" Успешно!");
-		responseLabel.setIcon(createIcon("image/good.png"));
+		responseLabel.setIcon(createIcon("../image/good.png"));
 		responseLabel.setVisible(true);
 	}
 	
 	public void SetBadConnection() {
 		responseLabel.setText(" Неудача!");
-		responseLabel.setIcon(createIcon("image/bad.png"));
+		responseLabel.setIcon(createIcon("../image/bad.png"));
 		responseLabel.setVisible(true);
+	}
+	
+	public void AddToLog(String str) {
+		str += System.getProperty("line.separator");
+		logs.append(str);
+		logs.update(logs.getGraphics());
 	}
 }

@@ -1,3 +1,4 @@
+package MVC;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -27,8 +28,12 @@ public class DBCompareModel {
 			con.close();
 			return true;
 		} catch (ClassNotFoundException e) {
+			DBCompareController.AddLogMessage("Не найден класс-драйвер базы данных! Текст ошибки:");
+			DBCompareController.AddLogMessage(e.getMessage());
 			return false;
 		} catch (SQLException e) {
+			DBCompareController.AddLogMessage("Ошибка подключения к базе данных! Текст ошибки:");
+			DBCompareController.AddLogMessage(e.getMessage());
 			return false;
 		}
 	}
@@ -64,16 +69,17 @@ public class DBCompareModel {
 	
 	public void CreateDBMetaFile(String[] dbInfo) {
 		DBWork db = new DBWork();
+		DBCompareController.AddLogMessage("Анализирую базу данных...");
 		DataBase db1 = db.createObjDB(dbInfo);
 		if (db.getState()) {
 			dirPath += "\\out.dat";
-			//logs.addMsg("Создаю файл на основе базы данных...");
+			DBCompareController.AddLogMessage("Сохраняю файл на диск");
 			FileWorkWriteDB fileDB = new FileWorkWriteDB(db1);
 			StringBuilder DBString = fileDB.CreateFileDB();
 			if (Filework.write(dirPath, DBString)) {
 				db.close();
-				//String str = "Программа успешно завершена! Созданный файл находится в " + dirPath;
-				//logs.addMsg(str);
+				String str = "Программа успешно завершена! Созданный файл находится в " + dirPath;
+				DBCompareController.AddLogMessage(str);
 			}
 		}
 	}
