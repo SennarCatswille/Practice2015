@@ -1,4 +1,5 @@
 package MVC;
+import java.awt.Dimension;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
@@ -22,6 +23,7 @@ public class DBCompareController {
 		this.theView.AddCompareDBMenuItemActionListener(new SwitchToCompareDBPageActionListener());
 		this.theView.AddCheckDBButtonActionListener(new CheckDBButtonActionListener());
 		this.theView.AddDirpathButtonActionListener(new ChooseDirActionListener());
+		this.theView.AddFilepathButtonActionListener(new ChooseFileActionListener());
 		this.theView.AddConfirmButtonActionListener(new ConfirmButtonActionListener());
 	}
 	
@@ -75,10 +77,29 @@ public class DBCompareController {
                 dirpath = file.getPath();
                 theModel.setDirPath(dirpath);
                 Object button = e.getSource();
-                theView.SetDirPathOnButton(button, dirpath);
-                AddLogMessage("Выбрана директория для вывода: ");
+                theView.SetPathOnButton(button, dirpath);
+                AddLogMessage("Выбрана директория для вывода:");
                 AddLogMessage("  " + dirpath);
             }			
+		}
+	}
+	
+	class ChooseFileActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			String filepath;
+			JFileChooser fileOpen = new JFileChooser();     
+            fileOpen.setFileSelectionMode(JFileChooser.FILES_ONLY);
+            int ret = fileOpen.showDialog(null, "Открыть файл");                
+            if (ret == JFileChooser.APPROVE_OPTION) {
+            	File file = fileOpen.getSelectedFile();
+            	filepath = file.getPath();
+            	theModel.setFilePath(filepath);
+                Object button = e.getSource();
+                theView.SetPathOnButton(button, filepath);
+                AddLogMessage("Выбран входной файл:");
+                AddLogMessage("  " + filepath);
+            }
 		}
 	}
 	

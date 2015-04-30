@@ -22,7 +22,7 @@ public class DBCompareView extends JFrame {
 	
 	private JMenu firstMenu = new JMenu("Выберите раздел");
 	private JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
-	private JMenuItem compareDBMenuItem = new JMenuItem("Создание файла мета-данных");
+	private JMenuItem compareDBMenuItem = new JMenuItem("Сравнение базы данных");
 	private JMenuItem testMenuItem = new JMenuItem("Тестовый пункт (не работает)");
 	private JMenuItem exitNemuItem = new JMenuItem("Выход");
 	private JMenu settingsMenu = new JMenu("Настройки");	
@@ -36,7 +36,7 @@ public class DBCompareView extends JFrame {
 	private JPanel rightPanel = new JPanel(); // правая часть с логом действий	
 	private Font font = new Font("Colibri", 0, 12);
 	private JLabel logsLabel = new JLabel("Действия программы:");
-	private JTextArea logs = new JTextArea();
+	private JTextArea logs = new JTextArea(19, 30);
 	private JScrollPane scrollPane = new JScrollPane(logs);
 	private JLabel dbHostLabel = new JLabel("Расположение БД:");
 	private JLabel dbNameLabel = new JLabel("Имя базы данных:");
@@ -50,7 +50,9 @@ public class DBCompareView extends JFrame {
 	private JLabel responseLabel = new JLabel();
 	private JLabel versionsLabel = new JLabel("Выберите версию:");
 	private JComboBox<String> versionsComboBox = new JComboBox<>(versions);
-	private JLabel dirPathLabel = new JLabel("Путь директории:");
+	private JLabel filePathLabel = new JLabel("Путь файла:");
+	private JButton filePathButton = new JButton("Выберите файл...");
+	private JLabel dirPathLabel = new JLabel("Путь сохранения:");
 	private JButton dirPathButton = new JButton("Выберите директорию...");
 	private JButton confirmButton = new JButton("Создать мета-описание");
 	
@@ -155,7 +157,6 @@ public class DBCompareView extends JFrame {
 		responseLabel.setFont(font);
 		responseLabel.setVisible(false);
 		leftPanel.add(responseLabel, gbc);
-		/*
 		gbc.gridx = 0;
 		gbc.gridy = 5;
 		versionsLabel.setFont(font);
@@ -163,17 +164,26 @@ public class DBCompareView extends JFrame {
 		gbc.gridx = 1;
 		gbc.gridy = 5;
 		versionsComboBox.setFont(font);
-		leftPanel.add(versionsComboBox, gbc);*/
+		leftPanel.add(versionsComboBox, gbc);
 		gbc.gridx = 0;
 		gbc.gridy = 6;
+		filePathLabel.setFont(font);
+		leftPanel.add(filePathLabel, gbc);
+		gbc.gridx = 1;
+		gbc.gridy = 6;
+		filePathButton.setFont(font);
+		leftPanel.add(filePathButton, gbc);
+		gbc.gridx = 0;
+		gbc.gridy = 7;
 		dirPathLabel.setFont(font);
 		leftPanel.add(dirPathLabel, gbc);
 		gbc.gridx = 1;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		dirPathButton.setFont(font);
 		leftPanel.add(dirPathButton, gbc);
+		filePathButton.setPreferredSize(dirPathButton.getPreferredSize());
 		gbc.gridx = 0;
-		gbc.gridy = 7;
+		gbc.gridy = 8;
 		gbc.insets = new Insets(10, 10, 3, 3);
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
 		confirmButton.setFont(font);
@@ -184,7 +194,6 @@ public class DBCompareView extends JFrame {
 		logs.setEditable(false);
         logs.setLineWrap(true);
         logs.setWrapStyleWord(true);
-        logs.setPreferredSize(new Dimension(330, 300));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         
         gbc.insets = new Insets(3, 3, 3, 3);
@@ -259,6 +268,10 @@ public class DBCompareView extends JFrame {
 		confirmButton.addActionListener(al);
 	}
 	
+	public void AddFilepathButtonActionListener (ActionListener al) {
+		filePathButton.addActionListener(al);
+	}
+	
 	public void AddDirpathButtonActionListener (ActionListener al) {
 		dirPathButton.addActionListener(al);
 	}
@@ -304,7 +317,7 @@ public class DBCompareView extends JFrame {
 	/*
 	 * Методы установки значений визуальным компонентам
 	 */
-	public void SetDirPathOnButton (Object button, String dp) {
+	public void SetPathOnButton (Object button, String dp) {
 		if(button instanceof JButton){
             if (!dp.isEmpty()) {
             	int t = 0;

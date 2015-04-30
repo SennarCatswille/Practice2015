@@ -17,6 +17,7 @@ import objDB.DataBase;
  */
 public class DBCompareModel {
 	private String dirPath;
+	private String filePath;
 	/*
 	 * Метод тестирования подключения к базе данных.
 	 */
@@ -65,6 +66,10 @@ public class DBCompareModel {
 	
 	public void setDirPath(String dp) {
 		dirPath = dp;
+	}
+	
+	public void setFilePath(String fp) {
+		filePath = fp;
 	}
 	
 	public void CreateDBMetaFile(String[] dbInfo) {

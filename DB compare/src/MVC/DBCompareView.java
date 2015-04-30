@@ -48,8 +48,6 @@ public class DBCompareView extends JFrame {
 	private JPasswordField dbPass = new JPasswordField(15);
 	private JButton checkDBButton = new JButton("Проверить");
 	private JLabel responseLabel = new JLabel();
-	private JLabel versionsLabel = new JLabel("Выберите версию:");
-	private JComboBox<String> versionsComboBox = new JComboBox<>(versions);
 	private JLabel dirPathLabel = new JLabel("Путь директории:");
 	private JButton dirPathButton = new JButton("Выберите директорию...");
 	private JButton confirmButton = new JButton("Создать мета-описание");
