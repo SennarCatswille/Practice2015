@@ -1,3 +1,4 @@
+//- Вьюха от админской проги
 package MVC;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -15,6 +16,7 @@ import javax.swing.*;
 public class DBCompareView extends JFrame {
 	private int index = -1;
 	private JMenuBar mainMenu = new JMenuBar();
+	private int compareFlag;
 	private String[] versions = {
 		new String("0.1"),
 		new String("0.5")
@@ -48,6 +50,12 @@ public class DBCompareView extends JFrame {
 	private JPasswordField dbPass = new JPasswordField(15);
 	private JButton checkDBButton = new JButton("Проверить");
 	private JLabel responseLabel = new JLabel();
+//-- Для пользовательской проги ------
+	private JLabel versionsLabel = new JLabel("Выберите версию:");
+	private JComboBox<String> versionsComboBox = new JComboBox<>(versions);
+	private JLabel filePathLabel = new JLabel("Путь файла:");
+	private JButton filePathButton = new JButton("Выберите файл...");
+//------------------------------------
 	private JLabel dirPathLabel = new JLabel("Путь директории:");
 	private JButton dirPathButton = new JButton("Выберите директорию...");
 	private JButton confirmButton = new JButton("Создать мета-описание");
@@ -57,11 +65,12 @@ public class DBCompareView extends JFrame {
 			mainPanel
 	};
 	
-	public DBCompareView() {
+	public DBCompareView(int compareFlag) {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
 		this.setIconImage(createIcon("../image/miniLogo.png").getImage());
 		this.setMinimumSize(new Dimension(700, 400));
 		this.setSize(500, 350);
+		this.compareFlag = compareFlag;
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		} catch(Exception e) {}		
@@ -153,27 +162,39 @@ public class DBCompareView extends JFrame {
 		responseLabel.setFont(font);
 		responseLabel.setVisible(false);
 		leftPanel.add(responseLabel, gbc);
-		/*
+		if (compareFlag == 1) {
+			gbc.gridx = 0;
+			gbc.gridy = 5;
+			versionsLabel.setFont(font);
+			leftPanel.add(versionsLabel, gbc);
+			gbc.gridx = 1;
+			gbc.gridy = 5;
+			versionsComboBox.setFont(font);
+			leftPanel.add(versionsComboBox, gbc);
+			gbc.gridx = 0;
+			gbc.gridy = 6;
+			filePathLabel.setFont(font);
+			leftPanel.add(filePathLabel, gbc);
+			gbc.gridx = 1;
+			gbc.gridy = 6;
+			filePathButton.setFont(font);
+			leftPanel.add(filePathButton, gbc);
+		}
 		gbc.gridx = 0;
-		gbc.gridy = 5;
-		versionsLabel.setFont(font);
-		leftPanel.add(versionsLabel, gbc);
-		gbc.gridx = 1;
-		gbc.gridy = 5;
-		versionsComboBox.setFont(font);
-		leftPanel.add(versionsComboBox, gbc);*/
-		gbc.gridx = 0;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		dirPathLabel.setFont(font);
 		leftPanel.add(dirPathLabel, gbc);
 		gbc.gridx = 1;
-		gbc.gridy = 6;
+		gbc.gridy = 7;
 		dirPathButton.setFont(font);
 		leftPanel.add(dirPathButton, gbc);
 		gbc.gridx = 0;
-		gbc.gridy = 7;
+		gbc.gridy = 8;
 		gbc.insets = new Insets(10, 10, 3, 3);
 		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		if (compareFlag == 1) {
+			confirmButton.setText("Сравнить базу данных");
+		}
 		confirmButton.setFont(font);
 		leftPanel.add(confirmButton, gbc);
 		
@@ -222,6 +243,9 @@ public class DBCompareView extends JFrame {
 		mainPageMenuItem.setFont(programFont);
 		firstMenu.add(mainPageMenuItem);
 		compareDBMenuItem.setFont(programFont);
+		if (compareFlag == 1) {
+			compareDBMenuItem.setText("Сравнение базы данных");
+		}
 		firstMenu.add(compareDBMenuItem);
 		testMenuItem.setFont(programFont);
 		firstMenu.add(testMenuItem);
@@ -255,6 +279,10 @@ public class DBCompareView extends JFrame {
 	 */
 	public void AddConfirmButtonActionListener (ActionListener al) {
 		confirmButton.addActionListener(al);
+	}
+	
+	public void AddFilepathButtonActionListener (ActionListener al) {
+		filePathButton.addActionListener(al);
 	}
 	
 	public void AddDirpathButtonActionListener (ActionListener al) {
@@ -299,6 +327,10 @@ public class DBCompareView extends JFrame {
 		String pass = new String(dbPass.getPassword()); 
 		return pass;
 	}
+	
+	public int getCompareFlag() {
+		return this.compareFlag;
+	}
 	/*
 	 * Методы установки значений визуальным компонентам
 	 */
@@ -329,6 +361,11 @@ public class DBCompareView extends JFrame {
 		responseLabel.setText(" Неудача!");
 		responseLabel.setIcon(createIcon("../image/bad.png"));
 		responseLabel.setVisible(true);
+	}
+	
+	public void SetDefaultNameButton() {
+		filePathButton.setText("Выберите файл...");
+		dirPathButton.setText("Выберите директорию...");
 	}
 	
 	public void AddToLog(String str) {

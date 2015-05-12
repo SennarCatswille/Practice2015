@@ -1,11 +1,14 @@
 package MVC;
+import java.io.File;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 
 import javax.swing.JOptionPane;
 
+import outputInfo.OutInfo;
 import myutils.DBWork;
+import myutils.FileWorkReadDB;
 import myutils.FileWorkWriteDB;
 import myutils.Filework;
 import objDB.DataBase;
@@ -17,6 +20,8 @@ import objDB.DataBase;
  */
 public class DBCompareModel {
 	private String dirPath;
+	private String filePath;
+	private OutInfo oi = null;
 	/*
 	 * Метод тестирования подключения к базе данных.
 	 */
@@ -67,9 +72,12 @@ public class DBCompareModel {
 		dirPath = dp;
 	}
 	
+	public void setFilePath(String fp) {
+		filePath = fp;
+	}
+	
 	public void CreateDBMetaFile(String[] dbInfo) {
 		DBWork db = new DBWork();
-		DBCompareController.AddLogMessage("Анализирую базу данных...");
 		DataBase db1 = db.createObjDB(dbInfo);
 		if (db.getState()) {
 			dirPath += "\\out.dat";
@@ -82,6 +90,43 @@ public class DBCompareModel {
 				DBCompareController.AddLogMessage(str);
 			}
 		}
+	}
+	
+	public void CompareDB(String[] dbInfo) {
+		DBWork db = new DBWork();
+		DBCompareController.AddLogMessage("Создаю объект базы данных...");
+		DataBase db2 = db.createObjDB(dbInfo);
+		DBCompareController.AddLogMessage("Считываю информацию о базе данных из файла...");
+		if (!(new File(filePath).exists())) {
+			DBCompareController.AddLogMessage("Файл недоступен или не существует!");
+			return;
+		}
+		DataBase db1 = FileWorkReadDB.readDB(filePath);
+		DBCompareController.AddLogMessage("Успешно! Начинаю сравнение...");
+		if (db.getState()) {
+			dirPath += "\\out.txt";
+			//int flag = db.analysis(dirpath);
+			db1.equals(db2);
+			db.close();	
+			oi = new OutInfo(db1.getEE(), db1.getNE(), db1.getPE());
+			int flag = oi.getFile(dirPath);
+			String str = null;
+			switch (flag) {
+				case -1:
+					str = new String("Сравнение завершено! Базы данных идентичны!"); break;
+				case 0:
+					str = new String("Сравнение успешно завершено! Обнаружены различия. Они находятся в файле " + dirPath); break;
+				case 1:
+					str = new String("Ошибка открытия файла для записи!"); break;
+				case 2:
+					str = new String("Ошибка записи данных в файл!"); break;
+				case 3:
+					str = new String("Ошибка сохранения файла на диске!"); break;
+				case 4:
+					str = new String("Ошибка закрытия потока вывода!"); break;
+			}						
+			DBCompareController.AddLogMessage(str);
+		}	
 	}
 }
 

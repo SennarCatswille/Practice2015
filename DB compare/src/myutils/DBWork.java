@@ -44,7 +44,7 @@ public class DBWork {
 	 * [2] - пользователь
 	 * [3] - пароль
 	 */
-	public DataBase createObjDB(String[] dbInfo) {
+	public DataBase createObjDB(String[] dbInfo) {		
 		ArrayList<Scheme> scheme = new ArrayList<>();
 		ArrayList<Table> table = new ArrayList<>();
 		ArrayList<Column> column = new ArrayList<>();
@@ -53,6 +53,7 @@ public class DBWork {
 		conDB = dbInfo;
 		
 		ConnectionToDB();
+		DBCompareController.AddLogMessage("јнализирую базу данных...");
 		if (state) {
 			//- ≈сли подключение установлено успешно, начинаем преобразование базы данных
 			try {
@@ -70,6 +71,7 @@ public class DBWork {
 					}
 					scheme.add(new Scheme(s, table));
 					table = null;
+					i++;
 				}
 				db = new DataBase(scheme);
 				scheme.clear();
