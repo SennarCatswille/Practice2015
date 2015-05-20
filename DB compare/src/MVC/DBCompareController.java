@@ -16,6 +16,7 @@ public class DBCompareController {
 	private boolean dirPathFlag = false;
 	private boolean filePathFlag = false;
 	
+	
 	public DBCompareController(DBCompareView theView, DBCompareModel theModel) {
 		this.theView = theView;
 		this.theModel = theModel;
@@ -26,12 +27,15 @@ public class DBCompareController {
 		this.theView.AddCheckDBButtonActionListener(new CheckDBButtonActionListener());
 		this.theView.AddDirpathButtonActionListener(new ChooseDirActionListener());
 		this.theView.AddFilepathButtonActionListener(new ChooseFileActionListener());
+		this.theView.AddSettingsMenuItemActionListener(new SwitchToSettingsMenuActionListener());
 		
 		if (this.theView.getCompareFlag() == 1) {
 			this.theView.AddConfirmButtonActionListener(new CompareDBActionListener());
 		} else if (this.theView.getCompareFlag() == 2) {
 			this.theView.AddConfirmButtonActionListener(new CreateFileActionListener());
 		}
+		
+		//this.theView.SetLogsDirPath(path);
 	}
 	
 	class ExitMenuItemActionListener implements ActionListener {
@@ -53,6 +57,13 @@ public class DBCompareController {
 		public void actionPerformed(ActionEvent arg0) {
 			theView.ChangeForm(1);
 		}		
+	}
+	
+	class SwitchToSettingsMenuActionListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			theView.ChangeForm(2);
+		}
 	}
 	
 	class CheckDBButtonActionListener implements ActionListener {
@@ -170,6 +181,13 @@ public class DBCompareController {
 			dirPathFlag = false;
 			filePathFlag = false;
 		}		
+	}
+	
+	class CreateZipArchive implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+		
+		}
 	}
 	
 	public static void AddLogMessage(String str) {

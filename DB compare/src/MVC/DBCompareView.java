@@ -1,4 +1,3 @@
-//- Вьюха от админской проги
 package MVC;
 import java.awt.*;
 import java.awt.event.ActionListener;
@@ -6,33 +5,30 @@ import java.awt.event.ActionListener;
 import javax.swing.*;
 
 /**
- * 
- */
-
-/**
  * @author Sennar
  *
  */
 public class DBCompareView extends JFrame {
-	private int index = -1;
-	private JMenuBar mainMenu = new JMenuBar();
-	private int compareFlag;
-	private String[] versions = {
+	private static final long serialVersionUID = -4326045582376815090L;
+	private int index = -1; // Индекс текущего окна
+	private JMenuBar mainMenu = new JMenuBar(); // Верхнее меню
+	private int compareFlag; // Метка работы программы
+	private String[] versions = { // Версии программы
 		new String("0.1"),
 		new String("0.5")
 	};
-	
+//-- Верхнее меню --------------------
 	private JMenu firstMenu = new JMenu("Выберите раздел");
 	private JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
 	private JMenuItem compareDBMenuItem = new JMenuItem("Создание файла мета-данных");
-	private JMenuItem testMenuItem = new JMenuItem("Тестовый пункт (не работает)");
+	//private JMenuItem testMenuItem = new JMenuItem("Тестовый пункт (не работает)");
 	private JMenuItem exitNemuItem = new JMenuItem("Выход");
-	private JMenu settingsMenu = new JMenu("Настройки");	
-	
+	private JMenuItem settingsMenuItem = new JMenuItem("Настройки");	
+//-- Начальная форма -----------------
 	private JPanel firstPanel = new JPanel();
 	private JLabel centerIcon = new JLabel();
 	private JLabel nameLabel = new JLabel("Сравнение баз данных v0.1");
-	
+//-- Основная форма ------------------
 	private JPanel mainPanel = new JPanel(); // общая панель
 	private JPanel leftPanel = new JPanel(); // левая часть с авторизацией и кнопками
 	private JPanel rightPanel = new JPanel(); // правая часть с логом действий	
@@ -50,19 +46,27 @@ public class DBCompareView extends JFrame {
 	private JPasswordField dbPass = new JPasswordField(15);
 	private JButton checkDBButton = new JButton("Проверить");
 	private JLabel responseLabel = new JLabel();
-//-- Для пользовательской проги ------
+//-- Для сравнения БД ----------------
 	private JLabel versionsLabel = new JLabel("Выберите версию:");
 	private JComboBox<String> versionsComboBox = new JComboBox<>(versions);
 	private JLabel filePathLabel = new JLabel("Путь файла:");
 	private JButton filePathButton = new JButton("Выберите файл...");
-//------------------------------------
+//-- Для создания файла --------------
 	private JLabel dirPathLabel = new JLabel("Путь директории:");
 	private JButton dirPathButton = new JButton("Выберите директорию...");
 	private JButton confirmButton = new JButton("Создать мета-описание");
-	
+//-- Окно настроек --------------------
+	private JPanel settingsPanel = new JPanel();
+	private JLabel copyPathLabel  = new JLabel("Путь копируемой папки:");
+	private JTextField copyPath = new JTextField(15);
+	private JButton copyPathButton = new JButton("Обзор...");
+	private JLabel zipFilePathLabel = new JLabel("Выберите место сохранения архива:");
+	private JButton zipFilePathButton = new JButton("Обзор...");	
+//-------------------------------------
 	private JPanel[] programForms = {
 			firstPanel,
-			mainPanel
+			mainPanel,
+			settingsPanel
 	};
 	
 	public DBCompareView(int compareFlag) {
@@ -247,17 +251,14 @@ public class DBCompareView extends JFrame {
 			compareDBMenuItem.setText("Сравнение базы данных");
 		}
 		firstMenu.add(compareDBMenuItem);
-		testMenuItem.setFont(programFont);
-		firstMenu.add(testMenuItem);
+		settingsMenuItem.setFont(programFont);
+		firstMenu.add(settingsMenuItem);
 		firstMenu.addSeparator();
 		exitNemuItem.setFont(programFont);
-		firstMenu.add(exitNemuItem);
+		firstMenu.add(exitNemuItem);		
 		
 		mainMenu.add(firstMenu);
-		
-		settingsMenu.setFont(programFont);
-		mainMenu.add(settingsMenu);
-		
+				
 		mainMenu.setFont(programFont);
 		
 		return mainMenu;
@@ -305,8 +306,8 @@ public class DBCompareView extends JFrame {
 		exitNemuItem.addActionListener(al);
 	}
 	
-	public void SettingsMenuActionListener (ActionListener al) {
-		settingsMenu.addActionListener(al);
+	public void AddSettingsMenuItemActionListener (ActionListener al) {
+		settingsMenuItem.addActionListener(al);
 	}
 	/*
 	 * Методы получения информации из полей ввода
@@ -366,6 +367,10 @@ public class DBCompareView extends JFrame {
 	public void SetDefaultNameButton() {
 		filePathButton.setText("Выберите файл...");
 		dirPathButton.setText("Выберите директорию...");
+	}
+	
+	public void SetLogsDirPath(String path) {
+		
 	}
 	
 	public void AddToLog(String str) {

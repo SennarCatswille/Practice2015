@@ -22,6 +22,7 @@ import myutils.DBWork;
 import myutils.FileWorkReadDB;
 import myutils.FileWorkWriteDB;
 import myutils.Filework;
+import myutils.ReadConfigFile;
 import objDB.DataBase;
 
 
@@ -33,6 +34,8 @@ public class DBCompareModel {
 	private String dirPath;
 	private String filePath;
 	private OutInfo oi = null;
+	private ReadConfigFile readConfigFile = new ReadConfigFile();
+	
 	/*
 	 * Метод тестирования подключения к базе данных.
 	 */
@@ -139,8 +142,13 @@ public class DBCompareModel {
 		}	
 	}
 	
-	private static void directoryToZip(File directory, File zipFile) throws IOException {
-        URI base = directory.toURI();
+	public String getLogsDirPath() {
+		return readConfigFile.getLogsDirPath().getPath();
+	}
+	
+	public void directoryToZip(File zipFile) throws IOException {
+        File directory = readConfigFile.getLogsDirPath();
+		URI base = directory.toURI();
         Deque<File> queue = new LinkedList<>();
         queue.push(directory);
         OutputStream out = new FileOutputStream(zipFile);
