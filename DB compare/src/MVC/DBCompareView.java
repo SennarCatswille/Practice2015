@@ -1,8 +1,11 @@
 package MVC;
 import java.awt.*;
 import java.awt.event.ActionListener;
+import java.awt.event.AdjustmentEvent;
+import java.awt.event.AdjustmentListener;
 
 import javax.swing.*;
+import javax.swing.text.DefaultCaret;
 
 /**
  * @author Sennar
@@ -207,8 +210,13 @@ public class DBCompareView extends JFrame {
 		logs.setEditable(false);
         logs.setLineWrap(true);
         logs.setWrapStyleWord(true);
-        logs.setPreferredSize(new Dimension(330, 300));
+        
+        DefaultCaret caret = (DefaultCaret)logs.getCaret();
+		caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
+        
+        //logs.setPreferredSize(new Dimension(330, 300));
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scrollPane.setPreferredSize(new Dimension(330, 300));       
         
         gbc.insets = new Insets(3, 3, 3, 3);
         gbc.gridx = 0;
@@ -377,5 +385,6 @@ public class DBCompareView extends JFrame {
 		str += System.getProperty("line.separator");
 		logs.append(str);
 		logs.update(logs.getGraphics());
+		scrollPane.updateUI();
 	}
 }

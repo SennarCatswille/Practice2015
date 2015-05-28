@@ -17,6 +17,7 @@ public class DBCompareController {
 	private boolean filePathFlag = false;
 	
 	
+	@SuppressWarnings("static-access")
 	public DBCompareController(DBCompareView theView, DBCompareModel theModel) {
 		this.theView = theView;
 		this.theModel = theModel;

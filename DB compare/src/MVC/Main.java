@@ -8,7 +8,7 @@ package MVC;
  *
  */
 public class Main {
-	private static int compareFlag = 1; 
+	private static int compareFlag = 2; 
 	/*
 	 * Определяет направленность программы: 
 	 * 		1 - сравнение базы
