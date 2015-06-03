@@ -6,6 +6,8 @@ import java.io.File;
 
 import javax.swing.*;
 
+import myutils.ReadConfigFile;
+
 /**
  * @author Sennar
  *
@@ -42,7 +44,8 @@ public class DBCompareController {
 	class ExitMenuItemActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			theView.dispose();			
+			System.out.print(ReadConfigFile.getFilePath("MVC.Main"));
+			//theView.dispose();			
 		}
 	}
 	

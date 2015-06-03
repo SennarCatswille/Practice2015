@@ -1,8 +1,6 @@
 package MVC;
 import java.awt.*;
 import java.awt.event.ActionListener;
-import java.awt.event.AdjustmentEvent;
-import java.awt.event.AdjustmentListener;
 
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
@@ -21,7 +19,7 @@ public class DBCompareView extends JFrame {
 		new String("0.5")
 	};
 //-- Верхнее меню --------------------
-	private JMenu firstMenu = new JMenu("Выберите раздел");
+	private JMenu firstMenu = new JMenu("Функции");
 	private JMenuItem mainPageMenuItem = new JMenuItem("Главная страница");
 	private JMenuItem compareDBMenuItem = new JMenuItem("Создание файла мета-данных");
 	//private JMenuItem testMenuItem = new JMenuItem("Тестовый пункт (не работает)");
@@ -60,11 +58,12 @@ public class DBCompareView extends JFrame {
 	private JButton confirmButton = new JButton("Создать мета-описание");
 //-- Окно настроек --------------------
 	private JPanel settingsPanel = new JPanel();
+	/*
 	private JLabel copyPathLabel  = new JLabel("Путь копируемой папки:");
 	private JTextField copyPath = new JTextField(15);
 	private JButton copyPathButton = new JButton("Обзор...");
 	private JLabel zipFilePathLabel = new JLabel("Выберите место сохранения архива:");
-	private JButton zipFilePathButton = new JButton("Обзор...");	
+	private JButton zipFilePathButton = new JButton("Обзор...");	*/
 //-------------------------------------
 	private JPanel[] programForms = {
 			firstPanel,
@@ -74,7 +73,7 @@ public class DBCompareView extends JFrame {
 	
 	public DBCompareView(int compareFlag) {
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		this.setIconImage(createIcon("../image/miniLogo.png").getImage());
+		this.setIconImage(createIcon("/image/miniLogo.png").getImage());
 		this.setMinimumSize(new Dimension(700, 400));
 		this.setSize(500, 350);
 		this.compareFlag = compareFlag;
@@ -107,7 +106,7 @@ public class DBCompareView extends JFrame {
 	private void CreateFirstPanel() {
 		BlockMenuItem(0);
 		
-		centerIcon.setIcon(createIcon("../image/ProgramLogo.png"));
+		centerIcon.setIcon(createIcon("/image/ProgramLogo.png"));
 		Font font = new Font("Colibri", 1, 16);
 		nameLabel.setFont(font);
 		
@@ -362,13 +361,13 @@ public class DBCompareView extends JFrame {
 	
 	public void SetGoodConnection() {
 		responseLabel.setText(" Успешно!");
-		responseLabel.setIcon(createIcon("../image/good.png"));
+		responseLabel.setIcon(createIcon("/image/good.png"));
 		responseLabel.setVisible(true);
 	}
 	
 	public void SetBadConnection() {
 		responseLabel.setText(" Неудача!");
-		responseLabel.setIcon(createIcon("../image/bad.png"));
+		responseLabel.setIcon(createIcon("/image/bad.png"));
 		responseLabel.setVisible(true);
 	}
 	

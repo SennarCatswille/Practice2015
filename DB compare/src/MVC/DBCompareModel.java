@@ -34,7 +34,6 @@ public class DBCompareModel {
 	private String dirPath;
 	private String filePath;
 	private OutInfo oi = null;
-	private ReadConfigFile readConfigFile = new ReadConfigFile();
 	
 	/*
 	 * Метод тестирования подключения к базе данных.
@@ -143,11 +142,12 @@ public class DBCompareModel {
 	}
 	
 	public String getLogsDirPath() {
-		return readConfigFile.getLogsDirPath().getPath();
+		return ReadConfigFile.getLogsDirPath().getPath();
 	}
 	
+	@SuppressWarnings("resource")
 	public void directoryToZip(File zipFile) throws IOException {
-        File directory = readConfigFile.getLogsDirPath();
+        File directory = ReadConfigFile.getLogsDirPath();
 		URI base = directory.toURI();
         Deque<File> queue = new LinkedList<>();
         queue.push(directory);
@@ -182,7 +182,7 @@ public class DBCompareModel {
                         } finally {
                             in.close();
                         }
-                        zout.closeEntry();
+                        zout.closeEntry();                        
                     }
                 }
             }
