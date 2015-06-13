@@ -6,12 +6,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.lang.management.ManagementFactory;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Deque;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -34,6 +37,7 @@ public class DBCompareModel {
 	private String dirPath;
 	private String filePath;
 	private OutInfo oi = null;
+	public static final String SUN_JAVA_COMMAND = "sun.java.command";
 	
 	/*
 	 * Метод тестирования подключения к базе данных.
@@ -55,7 +59,7 @@ public class DBCompareModel {
 			return false;
 		}
 	}
-	
+	//- Метод проверки подключения к базе данных
 	public String[] checkDB(String dbHost, String dbName, String dbUser, String dbPass) {
 		String[] dbauth = new String[4];
 		dbauth[0] = new String(dbHost);
@@ -88,7 +92,7 @@ public class DBCompareModel {
 	public void setFilePath(String fp) {
 		filePath = fp;
 	}
-	
+	//- Метод создания файла с метаинформацией
 	public void CreateDBMetaFile(String[] dbInfo) {
 		DBWork db = new DBWork();
 		DataBase db1 = db.createObjDB(dbInfo);
@@ -104,7 +108,7 @@ public class DBCompareModel {
 			}
 		}
 	}
-	
+	//- Метод сравнения базы данных
 	public void CompareDB(String[] dbInfo) {
 		DBWork db = new DBWork();
 		DBCompareController.AddLogMessage("Создаю объект базы данных...");
@@ -190,5 +194,59 @@ public class DBCompareModel {
             res.close();
         }
     }
+	
+	public String getProgramPath() {
+		String filePath = null;
+		try {
+			File file = new File(MVC.Main.class.getProtectionDomain().getCodeSource().getLocation().toURI().getPath());
+			filePath = file.getPath();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+		return filePath;
+	}
+	//- Метод рестарта приложения
+	public static void restartApplication(Runnable runBeforeRestart) throws IOException {
+		try {
+			String java = System.getProperty("java.home") + "/bin/java";
+			List<String> vmArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
+			StringBuffer vmArgsOneLine = new StringBuffer();
+			for (String arg : vmArguments) {
+				if (!arg.contains("-agentlib")) {
+					vmArgsOneLine.append(arg);
+					vmArgsOneLine.append(" ");
+				}
+			}
+			final StringBuffer cmd = new StringBuffer("\"" + java + "\" " + vmArgsOneLine);
+	
+			String[] mainCommand = System.getProperty(SUN_JAVA_COMMAND).split(" ");
+			if (mainCommand[0].endsWith(".jar")) {
+				cmd.append("-jar " + new File(mainCommand[0]).getPath());
+			} else {
+				cmd.append("-cp \"" + System.getProperty("java.class.path") + "\" " + mainCommand[0]);
+			}
+			for (int i = 1; i < mainCommand.length; i++) {
+				cmd.append(" ");
+				cmd.append(mainCommand[i]);
+			}
+			Runtime.getRuntime().addShutdownHook(new Thread() {
+				@Override
+				public void run() {
+					try {
+						Runtime.getRuntime().exec(cmd.toString());
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+
+			if (runBeforeRestart!= null) {
+				runBeforeRestart.run();
+			}
+			System.exit(0);
+		} catch (Exception e) {
+			throw new IOException("Error while trying to restart the application", e);
+		}
+	}
 }
 

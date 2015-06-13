@@ -1,11 +1,6 @@
 package MVC;
 
-
 import myutils.ReadConfigFile;
-
-/**
- * 
- */
 
 /**
  * @author Sennar

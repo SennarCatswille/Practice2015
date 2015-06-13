@@ -58,12 +58,13 @@ public class DBCompareView extends JFrame {
 	private JButton confirmButton = new JButton("Создать мета-описание");
 //-- Окно настроек --------------------
 	private JPanel settingsPanel = new JPanel();
-	/*
-	private JLabel copyPathLabel  = new JLabel("Путь копируемой папки:");
-	private JTextField copyPath = new JTextField(15);
-	private JButton copyPathButton = new JButton("Обзор...");
-	private JLabel zipFilePathLabel = new JLabel("Выберите место сохранения архива:");
-	private JButton zipFilePathButton = new JButton("Обзор...");	*/
+	private JLabel restartLabel = new JLabel("Для смены режима программы нажмите на кнопку перезапуска.");
+	private JButton restartButton = new JButton("Перезапустить");
+	//private JLabel copyPathLabel  = new JLabel("Путь копируемой папки:");
+	//private JTextField copyPath = new JTextField(15);
+	//private JButton copyPathButton = new JButton("Обзор...");
+	//private JLabel zipFilePathLabel = new JLabel("Выберите место сохранения архива:");
+	//private JButton zipFilePathButton = new JButton("Обзор...");
 //-------------------------------------
 	private JPanel[] programForms = {
 			firstPanel,
@@ -85,9 +86,7 @@ public class DBCompareView extends JFrame {
 		
 		CreateFirstPanel();
 		CreateComparePanel();
-		
-		//this.add(firstPanel);
-		//this.add(mainPanel);
+		CreateSettingsPanel();
 		
 		ChangeForm(0);
 	}
@@ -235,6 +234,25 @@ public class DBCompareView extends JFrame {
 		mainPanel.add(rightPanel);
 	}	
 	/*
+	 * Метод создания формы настроек
+	 */
+	private void CreateSettingsPanel() {
+		BlockMenuItem(2);
+		
+		settingsPanel.setLayout(new GridBagLayout());
+		
+		GridBagConstraints gbc = new GridBagConstraints();
+		gbc.gridwidth = GridBagConstraints.REMAINDER;
+		gbc.insets = new Insets(15, 1, 1, 1);
+		
+		gbc.gridx = 0;
+		gbc.gridy = 0;
+		settingsPanel.add(restartLabel, gbc);
+		gbc.gridy = 1;
+		settingsPanel.add(restartButton, gbc);
+	}
+	
+	/*
 	 * Метод блокировки пункта меню для запрета перехода на текущую форму
 	 */
 	private void BlockMenuItem(int index) {
@@ -299,6 +317,10 @@ public class DBCompareView extends JFrame {
 	
 	public void AddCheckDBButtonActionListener (ActionListener al) {
 		checkDBButton.addActionListener(al);
+	}
+	
+	public void AddRestartButtonActionListener (ActionListener al) {
+		restartButton.addActionListener(al);
 	}
 	
 	public void AddMainPageMenuItemActionListener (ActionListener al) {

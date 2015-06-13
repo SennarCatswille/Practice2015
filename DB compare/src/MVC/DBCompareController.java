@@ -1,14 +1,15 @@
-//- Для основной проги!
 package MVC;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.File;
+import java.io.IOException;
 
 import javax.swing.*;
 
 import myutils.ReadConfigFile;
 
 /**
+ * Контроллер приложения
  * @author Sennar
  *
  */
@@ -18,7 +19,7 @@ public class DBCompareController {
 	private boolean dirPathFlag = false;
 	private boolean filePathFlag = false;
 	
-	
+	//- Конструктор класса
 	@SuppressWarnings("static-access")
 	public DBCompareController(DBCompareView theView, DBCompareModel theModel) {
 		this.theView = theView;
@@ -31,6 +32,7 @@ public class DBCompareController {
 		this.theView.AddDirpathButtonActionListener(new ChooseDirActionListener());
 		this.theView.AddFilepathButtonActionListener(new ChooseFileActionListener());
 		this.theView.AddSettingsMenuItemActionListener(new SwitchToSettingsMenuActionListener());
+		this.theView.AddRestartButtonActionListener(new RestartProgramActionListener());
 		
 		if (this.theView.getCompareFlag() == 1) {
 			this.theView.AddConfirmButtonActionListener(new CompareDBActionListener());
@@ -40,12 +42,24 @@ public class DBCompareController {
 		
 		//this.theView.SetLogsDirPath(path);
 	}
-	
+	//- Обработчики событий для вида приложения
 	class ExitMenuItemActionListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			System.out.print(ReadConfigFile.getFilePath("MVC.Main"));
-			//theView.dispose();			
+			theView.dispose();			
+		}
+	}	
+	
+	class RestartProgramActionListener implements ActionListener {
+		@SuppressWarnings("static-access")
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			try {
+				ReadConfigFile.changeProgramMode();
+				theModel.restartApplication(null);
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
 		}
 	}
 	

@@ -1,6 +1,3 @@
-/**
- * Класс чтения объекта базы данных из файла
- */
 package myutils;
 
 import java.util.ArrayList;
@@ -12,6 +9,7 @@ import objDB.Scheme;
 import objDB.Table;
 
 /**
+ * Класс чтения объекта базы данных из файла
  * @author Кирилл
  *
  */
@@ -21,7 +19,12 @@ public class FileWorkReadDB {
 		ArrayList<Scheme> scheme = new ArrayList<>();
 		ArrayList<Table> table = null;
 		
-		StringBuilder mainStr = new StringBuilder(Filework.read(path));
+		//- Расшифровываем строку
+		StringCrypter crypter = new StringCrypter(new byte[]{1,4,5,6,8,9,7,8});
+		String tempStr = crypter.decrypt(Filework.read(path));
+		crypter = null;
+		
+		StringBuilder mainStr = new StringBuilder(tempStr);
 		StringBuilder workStr = null;
 	
 		do {
@@ -69,7 +72,7 @@ public class FileWorkReadDB {
 		db = new DataBase(scheme);
 		return db;
 	}
-	
+	//- Считывание ключей из строки
 	private static ArrayList<Keys> KeysFromStr(StringBuilder wstr, String schem) {
 		boolean flag = true;
 		ArrayList<Keys> keys = new ArrayList<>();
@@ -128,7 +131,7 @@ public class FileWorkReadDB {
 		}
 		return keys;
 	}
-	
+	//- Считывание имен полей из строки
 	private static ArrayList<Column> ColumnFromStr(StringBuilder wstr, String s, String t) {
 		boolean flag = true;
 		ArrayList<Column> column = new ArrayList<>();
@@ -164,7 +167,7 @@ public class FileWorkReadDB {
 		}
 		return column;
 	}
-	
+	//- Метод обрезания пробелов в StringBuilder
 	private static void TrimStringBuilder(StringBuilder str) {
 		if (str.length() != 0) {
 			char fchar = str.charAt(0);

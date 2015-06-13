@@ -42,8 +42,12 @@ public class FileWorkWriteDB {
 			}
 			outStr.append(" | ");
 		}
-		//l.addMsg("Вывод окончен");
-		return outStr;
+		//- Шифруем строку
+		StringCrypter crypter = new StringCrypter(new byte[]{1,4,5,6,8,9,7,8});
+		String tempStr = crypter.encrypt(outStr.toString());
+		crypter = null;
+		
+		return new StringBuilder(tempStr);
 	}
 	
 	private StringBuilder getStringColumn(Table t) {

@@ -6,7 +6,6 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -22,7 +21,7 @@ public class ReadConfigFile {
 	public static void Initialize() {
 		File filePath = new File("config.properties");
 		if (filePath.exists()) {
-			try {
+			try {				
 				Properties properties = new Properties();
 				properties.load(new FileInputStream(filePath));
 				programMode = new Integer(properties.getProperty("PROGRAM_MODE"));
@@ -68,26 +67,25 @@ public class ReadConfigFile {
 		return programMode;
 	}
 	
-	public static String getFilePath(String className) {
-	      if (!className.startsWith("/")) {
-	         className = "/" + className;
-	      }
-
-	      className = className.replace('.', '/');
-	      className = className + ".class";
-
-	      URL classUrl = new ReadConfigFile().getClass().getResource(className);
-	      if (classUrl != null) {
-	         String temp = classUrl.getFile();
-	         if (temp.startsWith("file:")) {
-	            return temp.substring(5);
-	         }
-
-	         return temp;
-	      } else {
-	         return "\nClass '" + className + 
-	            "' not found in \n'" +
-	            System.getProperty("java.class.path") + "'";
-	      }
-	   }
+	public static boolean changeProgramMode() {
+		try {
+			Properties properties = new Properties();
+			if (programMode == 1) {
+				properties.setProperty("PROGRAM_MODE", "2");
+				properties.setProperty("LOGS_DIR_PATH", baseDir);
+			} else {
+				properties.setProperty("PROGRAM_MODE", "1");
+				properties.setProperty("LOGS_DIR_PATH", baseDir);
+			}
+			File filePath = new File("config.properties");
+			if (filePath.exists()) {
+				properties.store(new FileOutputStream(filePath), null);
+				return true;
+			}
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return false;
+	}
 }
